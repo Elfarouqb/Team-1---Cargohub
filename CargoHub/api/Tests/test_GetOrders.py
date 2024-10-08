@@ -7,15 +7,10 @@ def _url():
     return 'http://localhost:3000/api/v1/'  # Base URL
 
 
-@pytest.fixture
-def api_key():
-    return 'a1b2c3d4e5'  # API key
-
-
-def test_get_orders(_url, api_key):
+def test_get_orders(_url):
     url = f"{_url}orders"
     headers = {
-        'API_KEY': api_key  # Add the API key to the headers
+        'API_KEY': 'a1b2c3d4e5'  # Add the API key to the headers
     }
 
     response = requests.get(url, headers=headers)
@@ -28,12 +23,12 @@ def test_get_orders(_url, api_key):
     assert status_code == 200
 
 
-def test_get_order(_url, api_key):
+def test_get_order(_url):
     order_id = 1  # The ID of the order
     url = f"{_url}orders/{order_id}"  # full URL for order 1
 
     headers = {
-        'API_KEY': api_key  # Add the API key to the headers
+        'API_KEY': 'a1b2c3d4e5'  # Add the API key to the headers
     }
 
     # Send a GET request to the API
