@@ -7,7 +7,7 @@ def _url():
     return 'http://localhost:3000/api/v1/item_lines'
 
 
-def test_get_item_group(_url):
+def test_get_all_item_lines(_url):
     url = _url
     headers = {
         'API_KEY': 'a1b2c3d4e5'  # Ensure this API key is valid and has access to the endpoint
