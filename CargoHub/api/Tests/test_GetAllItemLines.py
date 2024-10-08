@@ -4,7 +4,7 @@ import requests
 
 @pytest.fixture
 def _url():
-    return 'http://localhost:3000/api/v1/item_groups/1'
+    return 'http://localhost:3000/api/v1/item_lines'
 
 
 def test_get_item_group(_url):
