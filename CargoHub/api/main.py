@@ -11,6 +11,7 @@ from processors import notification_processor
 class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def handle_get_version_1(self, path, user):
+        print(f"Incoming path: {path}")
         if not auth_provider.has_access(user, path, "get"):
             self.send_response(403)
             self.end_headers()
@@ -19,12 +20,14 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
             paths = len(path)
             match paths:
                 case 1:
+                    print("Handling case 1: Fetching all warehouses")
                     warehouses = data_provider.fetch_warehouse_pool().get_warehouses()
                     self.send_response(200)
                     self.send_header("Content-type", "application/json")
                     self.end_headers()
                     self.wfile.write(json.dumps(warehouses).encode("utf-8"))
                 case 2:
+                    print(f"Handling case 2: Fetching warehouse with ID {path[1]}")
                     warehouse_id = int(path[1])
                     warehouse = data_provider.fetch_warehouse_pool().get_warehouse(warehouse_id)
                     self.send_response(200)
