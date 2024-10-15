@@ -14,7 +14,7 @@ def test_get_item_groups():
 
     status_code = response.status_code
 
-    assert status_code == 200, f"Unexpected status code: {status_code}. Response body: {response.text}"
+    assert status_code == 200
 
 
 def test_get_item_group():
@@ -27,7 +27,7 @@ def test_get_item_group():
 
     status_code = response.status_code
 
-    assert status_code == 200, f"Unexpected status code: {status_code}. Response body: {response.text}"
+    assert status_code == 200
 
 
 def test_add_item_group():
@@ -89,3 +89,14 @@ def test_update_item_group():
     assert test["name"] == updated_item_group["name"]
     assert test["description"] == updated_item_group["description"]
     assert test["created_at"] == updated_item_group["created_at"]
+
+
+def test_delete_item_group():
+    url = 'http://localhost:3000/api/v1/item_groups/1'
+    headers = {
+        'API_KEY': 'a1b2c3d4e5',
+    }
+
+    response = requests.delete(url, headers=headers)
+
+    assert response.status_code == 200

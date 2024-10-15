@@ -10,14 +10,11 @@ def _url():
 def test_get_all_item_lines(_url):
     url = _url
     headers = {
-        'API_KEY': 'a1b2c3d4e5'  # Ensure this API key is valid and has access to the endpoint
+        'API_KEY': 'a1b2c3d4e5'
     }
 
-    # Send a GET request to the API
     response = requests.get(url, headers=headers)
 
-    # Get the status code
     status_code = response.status_code
 
-    # Check if the status code is 200 (OK)
-    assert status_code == 200, f"Unexpected status code: {status_code}. Response body: {response.text}"
+    assert status_code == 200
