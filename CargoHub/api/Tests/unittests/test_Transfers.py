@@ -24,26 +24,20 @@ class TestTransferApi(unittest.TestCase):
             ]
         }
 
-        # Send POST request to create a new transfer
         response = self.client.post(self.baseUrl + "transfers", headers=self.headers, json=new_transfer)
 
-        # Verify that the response status code is 201
         self.assertEqual(response.status_code, 201, f"Expected 201, got {response.status_code}")
 
-        # Fetch the created transfer by ID
         created_transfer_response = self.client.get(self.baseUrl + "transfers/" + str(new_transfer["id"]), headers=self.headers)
         print(f"POST response content: {created_transfer_response.content}")
 
-        # Verify that the response status code is 200
         self.assertEqual(created_transfer_response.status_code, 200)
 
-        # Check that the details match what was sent
         created_transfer = created_transfer_response.json()
         self.assertEqual(created_transfer["id"], new_transfer["id"])
         self.assertEqual(created_transfer["reference"], new_transfer["reference"])
         self.assertEqual(created_transfer["transfer_status"], new_transfer["transfer_status"])
 
-        # Verify that the transfer exists in the list of transfers
         get_response = self.client.get(self.baseUrl + "transfers", headers=self.headers)
         self.assertEqual(get_response.status_code, 200)
         transfers = get_response.json()
@@ -111,7 +105,7 @@ class TestTransferApi(unittest.TestCase):
 
     def test_transfer_field_validation(self):
         invalid_transfer = {
-            "reference": "",  # Empty reference
+            "reference": "",
             "transfer_status": "Completed",
             "items": []
         }
