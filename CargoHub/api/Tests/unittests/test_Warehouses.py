@@ -9,21 +9,28 @@ class TestWarehouseApi(unittest.TestCase):
         self.client = Client()
         self.headers = {"API_KEY": "a1b2c3d4e5"}
     
+    
     def test_post_warehouse(self):
-        new_warehouse = {
+        
+
+        response = self.client.post(self.baseUrl + "warehouses", headers=self.headers, data={
             "id": 123456,
             "name": "Advanced Warehouse",
             "location": "789 Advanced Blvd",
             "capacity": 5000
-        }
-
-        response = self.client.post(self.baseUrl + "warehouses", headers=self.headers, json=new_warehouse)
+        })
 
         self.assertEqual(response.status_code, 201, f"Expected 201, got {response.status_code}")
 
+        new_warehouse = {
+                    "id": 123456,
+                    "name": "Advanced Warehouse",
+                    "location": "789 Advanced Blvd",
+                    "capacity": 5000
+                }
+        
         created_warehouse_response = self.client.get(self.baseUrl + "warehouses/" + str(new_warehouse["id"]), headers={"API_KEY":"a1b2c3d4e5"})
         print(f"POST response content: {created_warehouse_response.content}")
-
         self.assertEqual(created_warehouse_response.status_code, 500)
 
         created_warehouse = created_warehouse_response.json()
@@ -34,7 +41,7 @@ class TestWarehouseApi(unittest.TestCase):
 
         get_response = self.client.get(self.baseUrl + "warehouses", headers=self.headers)
         self.assertEqual(get_response.status_code, 200)
-        warehouses = get_response.jsDon()
+        warehouses = get_response.json()
         self.assertTrue(any(wh["id"] == created_warehouse["id"] for wh in warehouses))
         
     def test_get_single_warehouse(self):
