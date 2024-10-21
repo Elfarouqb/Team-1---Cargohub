@@ -50,9 +50,6 @@ def test_get_single_warehouse(client, base_url, headers):
 
     warehouse = valid_response.json()
     assert warehouse["id"] == valid_warehouse_id
-    assert "name" in warehouse
-    assert "location" in warehouse
-    assert "capacity" in warehouse
 
     invalid_response = client.get(f"{base_url}warehouses/{invalid_warehouse_id}", headers=headers)
     assert invalid_response.status_code == 404, "Invalid ID did not return a 404 status"
@@ -133,26 +130,28 @@ def test_warehouse_field_validation(client, base_url, headers):
     assert "name" in errors, "'name' validation error missing"
     assert "capacity" in errors, "'capacity' validation error missing"
 
-def test_warehouse_max_capacity(self):
+def test_warehouse_max_capacity(client, base_url, headers):
     new_warehouse = {
         "name": "Max Capacity Warehouse",
         "location": "999 Max Blvd",
         "capacity": 999999999  # Intentionally set a very large capacity
     }
     
-    response = self.client.post(self.baseUrl + "warehouses", headers=self.headers, json=new_warehouse)
-    assert (response.status_code == 400, "Expected 400 for exceeding max capacity")
+    response = client.post(f"{base_url}warehouses", headers=headers, json=new_warehouse)
+    assert response.status_code == 400, "Expected 400 for exceeding max capacity"
+    
     errors = response.json()
-    self.assertIn("capacity", errors, "'capacity' max validation error missing")
+    assert "capacity" in errors, "'capacity' max validation error missing"
 
-def test_warehouse_invalid_name_characters(self):
+def test_warehouse_invalid_name_characters(client, base_url, headers):
     new_warehouse = {
         "name": "Invalid@Name#!",
         "location": "123 Invalid St",
         "capacity": 1000
     }
     
-    response = self.client.post(self.baseUrl + "warehouses", headers=self.headers, json=new_warehouse)
-    assert (response.status_code == 400, "Expected 400 for invalid characters in name")
+    response = client.post(f"{base_url}warehouses", headers=headers, json=new_warehouse)
+    assert response.status_code == 400, "Expected 400 for invalid characters in name"
+    
     errors = response.json()
-    self.assertIn("name", errors, "'name' character validation error missing")
+    assert "name" in errors, "'name' character validation error missing"

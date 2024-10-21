@@ -124,42 +124,62 @@ def test_supplier_field_validation(client, base_url, headers):
     errors = response.json()
     assert "name" in errors, "'name' validation error missing"
 
-def test_supplier_duplicate_name(self):
+def test_supplier_duplicate_name(client, base_url, headers):
     existing_supplier = {
         "name": "Unique Supplier",
-        "location": "123 Unique St",
-        "contact_email": "contact@uniquesupplier.com"
+        "address": "123 Unique St",
+        "city": "Unique City",
+        "zip_code": "11111",
+        "province": "Unique Province",
+        "country": "Unique Country",
+        "contact_name": "Unique Contact",
+        "phonenumber": "123-456-7890",
+        "code": "SUP0010"
     }
 
     # Create the first supplier
-    create_response = self.client.post(self.baseUrl + "suppliers", headers=self.headers, json=existing_supplier)
-    self.assertEqual(create_response.status_code, 201, "Expected 201 for successful creation of supplier")
+    create_response = client.post(f"{base_url}suppliers", headers=headers, json=existing_supplier)
+    assert create_response.status_code == 201, f"Expected 201, got {create_response.status_code}"
 
     # Attempt to create a second supplier with the same name
     duplicate_supplier = {
         "name": "Unique Supplier",  # Same name as the previous supplier
-        "location": "456 Another St",
-        "contact_email": "duplicate@anotheremail.com"
+        "address": "456 Another St",
+        "city": "Another City",
+        "zip_code": "22222",
+        "province": "Another Province",
+        "country": "Another Country",
+        "contact_name": "Another Contact",
+        "phonenumber": "987-654-3210",
+        "code": "SUP0011"
     }
-    
-    response = self.client.post(self.baseUrl + "suppliers", headers=self.headers, json=duplicate_supplier)
-    self.assertEqual(response.status_code, 400, "Expected 400 for duplicate supplier name")
-    errors = response.json()
-    self.assertIn("name", errors, "'name' not unique")
 
-def test_supplier_invalid_email(self):
+    response = client.post(f"{base_url}suppliers", headers=headers, json=duplicate_supplier)
+    assert response.status_code == 400, f"Expected 400 for duplicate supplier name, got {response.status_code}"
+
+    errors = response.json()
+    assert "name" in errors, "'name' field is not unique"
+
+def test_supplier_invalid_email(client, base_url, headers):
     invalid_supplier = {
         "name": "Invalid Email Supplier",
-        "location": "123 Invalid Email St",
+        "address": "123 Invalid Email St",
+        "city": "Email City",
+        "zip_code": "33333",
+        "province": "Email Province",
+        "country": "Email Country",
+        "contact_name": "Email Contact",
+        "phonenumber": "555-555-5555",
+        "code": "SUP0012",
         "contact_email": "invalid-email-format"  # Invalid email format
     }
 
-    response = self.client.post(self.baseUrl + "suppliers", headers=self.headers, json=invalid_supplier)
-    
+    response = client.post(f"{base_url}suppliers", headers=headers, json=invalid_supplier)
+
     # Ensure that the server returns a 400 Bad Request due to invalid email format
-    self.assertEqual(response.status_code, 400, "Expected 400 for invalid email format")
-    
+    assert response.status_code == 400, f"Expected 400 for invalid email format, got {response.status_code}"
+
     # Check if the validation error is returned for the email field
     errors = response.json()
-    self.assertIn("contact_email", errors, "'contact_email' validation error missing")
-    self.assertIn("invalid", errors["contact_email"], "Expected 'invalid' error for invalid email format")
+    assert "contact_email" in errors, "'contact_email' validation error missing"
+    assert "invalid" in errors["contact_email"], "Expected 'invalid' error for invalid email format"
