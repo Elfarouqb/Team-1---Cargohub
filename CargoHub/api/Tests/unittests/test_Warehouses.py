@@ -5,33 +5,26 @@ import time
 
 class TestWarehouseApi(unittest.TestCase):
     def setUp(self):
-        self.baseUrl = "http://localhost:3000/api/v1/"
+        self.baseUrl = 'http://localhost:3000/api/v1/'
+        self.headers = {'API_KEY': 'a1b2c3d4e5'}
         self.client = Client()
-        self.headers = {"API_KEY": "a1b2c3d4e5"}
-    
     
     def test_post_warehouse(self):
-        
-
-        response = self.client.post(self.baseUrl + "warehouses", headers=self.headers, data={
+        new_warehouse = {
             "id": 123456,
             "name": "Advanced Warehouse",
             "location": "789 Advanced Blvd",
             "capacity": 5000
-        })
+        }
+
+        response = self.client.post(self.baseUrl + "warehouses", headers=self.headers, json=new_warehouse)
 
         self.assertEqual(response.status_code, 201, f"Expected 201, got {response.status_code}")
 
-        new_warehouse = {
-                    "id": 123456,
-                    "name": "Advanced Warehouse",
-                    "location": "789 Advanced Blvd",
-                    "capacity": 5000
-                }
-        
-        created_warehouse_response = self.client.get(self.baseUrl + "warehouses/" + str(new_warehouse["id"]), headers={"API_KEY":"a1b2c3d4e5"})
+        created_warehouse_response = self.client.get(self.baseUrl + "warehouses/" + str(new_warehouse["id"]), headers=self.headers)
         print(f"POST response content: {created_warehouse_response.content}")
-        self.assertEqual(created_warehouse_response.status_code, 500)
+
+        self.assertEqual(created_warehouse_response.status_code, 201)
 
         created_warehouse = created_warehouse_response.json()
         self.assertEqual(created_warehouse["id"], new_warehouse["id"])
