@@ -49,8 +49,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -58,8 +58,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Province")
                         .HasColumnType("text");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ZipCode")
                         .HasColumnType("text");
@@ -77,8 +77,8 @@ namespace Cargohub_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -98,17 +98,17 @@ namespace Cargohub_V2.Migrations
                     b.Property<int>("TotalAvailable")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TotalExpected")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TotalOnHand")
                         .HasColumnType("integer");
 
                     b.Property<int>("TotalOrdered")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
-
-                    b.Property<int>("totalExpected")
-                        .HasColumnType("integer");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -129,8 +129,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("CommodityCode")
                         .HasColumnType("text");
 
-                    b.Property<string>("Created_at")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -150,20 +150,17 @@ namespace Cargohub_V2.Migrations
                     b.Property<int>("PackOrderQuantity")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Shortescription")
+                    b.Property<string>("ShortDescription")
                         .HasColumnType("text");
 
                     b.Property<string>("SupplierCode")
                         .HasColumnType("text");
 
-                    b.Property<int?>("SupplierId")
+                    b.Property<int>("SupplierId")
                         .HasColumnType("integer");
 
                     b.Property<string>("SupplierPartNumber")
                         .HasColumnType("text");
-
-                    b.Property<int>("Supplier_id")
-                        .HasColumnType("integer");
 
                     b.Property<string>("UId")
                         .HasColumnType("text");
@@ -177,8 +174,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("UpcCode")
                         .HasColumnType("text");
 
-                    b.Property<string>("Updated_at")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -201,17 +198,19 @@ namespace Cargohub_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -226,17 +225,19 @@ namespace Cargohub_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Created_at")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Updated_at")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -251,17 +252,19 @@ namespace Cargohub_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Created_at")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Updated_at")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -279,14 +282,14 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Code")
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("integer");
@@ -307,14 +310,14 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("BillTo")
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<string>("OrderDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Order_status")
                         .HasColumnType("text");
@@ -328,8 +331,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Reference_extra")
                         .HasColumnType("text");
 
-                    b.Property<string>("RequestDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ShipTo")
                         .HasColumnType("text");
@@ -355,8 +358,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<double>("TotalTax")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("integer");
@@ -380,8 +383,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("CarrierDescription")
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -422,8 +425,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("TransferMode")
                         .HasColumnType("text");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -484,8 +487,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -499,8 +502,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("text");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ZipCode")
                         .HasColumnType("text");
@@ -518,8 +521,8 @@ namespace Cargohub_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Reference")
                         .HasColumnType("text");
@@ -533,8 +536,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<int>("TransferTo")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -561,8 +564,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -570,8 +573,8 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("Province")
                         .HasColumnType("text");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Zip")
                         .HasColumnType("text");
@@ -633,7 +636,9 @@ namespace Cargohub_V2.Migrations
 
                     b.HasOne("Cargohub_V2.Models.Supplier", "Supplier")
                         .WithMany()
-                        .HasForeignKey("SupplierId");
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ItemGroup");
 
@@ -671,7 +676,8 @@ namespace Cargohub_V2.Migrations
                                 .HasForeignKey("WarehouseId");
                         });
 
-                    b.Navigation("Contact");
+                    b.Navigation("Contact")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Cargohub_V2.Models.OrderStock", b =>

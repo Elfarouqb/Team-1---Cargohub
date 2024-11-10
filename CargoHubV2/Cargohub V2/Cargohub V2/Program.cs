@@ -11,8 +11,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
-
-SeedData1(app);
+if(args.Length > 0 && args[0] == "seed")
+{
+    SeedData1(app);
+}
 
 app.UseHttpsRedirection();
 

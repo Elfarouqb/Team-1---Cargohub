@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -27,8 +28,8 @@ namespace Cargohub_V2.Migrations
                     ContactName = table.Column<string>(type: "text", nullable: true),
                     ContactPhone = table.Column<string>(type: "text", nullable: true),
                     ContactEmail = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,12 +47,12 @@ namespace Cargohub_V2.Migrations
                     ItemReference = table.Column<string>(type: "text", nullable: true),
                     Locations = table.Column<List<int>>(type: "integer[]", nullable: true),
                     TotalOnHand = table.Column<int>(type: "integer", nullable: false),
-                    totalExpected = table.Column<int>(type: "integer", nullable: false),
+                    TotalExpected = table.Column<int>(type: "integer", nullable: false),
                     TotalOrdered = table.Column<int>(type: "integer", nullable: false),
                     TotalAllocated = table.Column<int>(type: "integer", nullable: false),
                     TotalAvailable = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,10 +65,10 @@ namespace Cargohub_V2.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,10 +81,10 @@ namespace Cargohub_V2.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Created_at = table.Column<string>(type: "text", nullable: true),
-                    Updated_at = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,10 +97,10 @@ namespace Cargohub_V2.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Created_at = table.Column<string>(type: "text", nullable: true),
-                    Updated_at = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,8 +116,8 @@ namespace Cargohub_V2.Migrations
                     WarehouseId = table.Column<int>(type: "integer", nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -130,8 +131,8 @@ namespace Cargohub_V2.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SourceId = table.Column<int>(type: "integer", nullable: false),
-                    OrderDate = table.Column<string>(type: "text", nullable: true),
-                    RequestDate = table.Column<string>(type: "text", nullable: true),
+                    OrderDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Reference = table.Column<string>(type: "text", nullable: true),
                     Reference_extra = table.Column<string>(type: "text", nullable: true),
                     Order_status = table.Column<string>(type: "text", nullable: true),
@@ -146,8 +147,8 @@ namespace Cargohub_V2.Migrations
                     TotalDiscount = table.Column<double>(type: "double precision", nullable: false),
                     TotalTax = table.Column<double>(type: "double precision", nullable: false),
                     TotalSurcharge = table.Column<double>(type: "double precision", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -175,8 +176,8 @@ namespace Cargohub_V2.Migrations
                     TransferMode = table.Column<string>(type: "text", nullable: true),
                     TotalPackageCount = table.Column<int>(type: "integer", nullable: false),
                     TotalPackageWeight = table.Column<double>(type: "double precision", nullable: false),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,8 +201,8 @@ namespace Cargohub_V2.Migrations
                     ContactName = table.Column<string>(type: "text", nullable: true),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     Reference = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -218,8 +219,8 @@ namespace Cargohub_V2.Migrations
                     TransferFrom = table.Column<int>(type: "integer", nullable: false),
                     TransferTo = table.Column<int>(type: "integer", nullable: false),
                     TransferStatus = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -239,11 +240,11 @@ namespace Cargohub_V2.Migrations
                     City = table.Column<string>(type: "text", nullable: true),
                     Province = table.Column<string>(type: "text", nullable: true),
                     Country = table.Column<string>(type: "text", nullable: true),
-                    Contact_Name = table.Column<string>(type: "text", nullable: true),
-                    Contact_Phone = table.Column<string>(type: "text", nullable: true),
-                    Contact_Email = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "text", nullable: true)
+                    Contact_Name = table.Column<string>(type: "text", nullable: false),
+                    Contact_Phone = table.Column<string>(type: "text", nullable: false),
+                    Contact_Email = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,7 +260,7 @@ namespace Cargohub_V2.Migrations
                     UId = table.Column<string>(type: "text", nullable: true),
                     Code = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Shortescription = table.Column<string>(type: "text", nullable: true),
+                    ShortDescription = table.Column<string>(type: "text", nullable: true),
                     UpcCode = table.Column<string>(type: "text", nullable: true),
                     ModelNumber = table.Column<string>(type: "text", nullable: true),
                     CommodityCode = table.Column<string>(type: "text", nullable: true),
@@ -269,12 +270,11 @@ namespace Cargohub_V2.Migrations
                     UnitPurchaseQuantity = table.Column<int>(type: "integer", nullable: false),
                     UnitOrderQuantity = table.Column<int>(type: "integer", nullable: false),
                     PackOrderQuantity = table.Column<int>(type: "integer", nullable: false),
-                    SupplierId = table.Column<int>(type: "integer", nullable: true),
-                    Supplier_id = table.Column<int>(type: "integer", nullable: false),
+                    SupplierId = table.Column<int>(type: "integer", nullable: false),
                     SupplierCode = table.Column<string>(type: "text", nullable: true),
                     SupplierPartNumber = table.Column<string>(type: "text", nullable: true),
-                    Created_at = table.Column<string>(type: "text", nullable: true),
-                    Updated_at = table.Column<string>(type: "text", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -298,7 +298,8 @@ namespace Cargohub_V2.Migrations
                         name: "FK_Items_Suppliers_SupplierId",
                         column: x => x.SupplierId,
                         principalTable: "Suppliers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
