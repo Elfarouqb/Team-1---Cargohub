@@ -70,7 +70,7 @@ namespace Cargohub_V2.Models
         [JsonConverter(typeof(FlexibleDateTimeConverter))]
         public DateTime UpdatedAt { get; set; }
 
-        [JsonProperty("stocks")]
+        [JsonProperty("items")]
         public List<OrderStock> Stocks { get; set; } = new List<OrderStock>();
     }
 }

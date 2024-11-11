@@ -1,9 +1,14 @@
-﻿namespace Cargohub_V2.Models
+﻿using Newtonsoft.Json;
+
+namespace Cargohub_V2.Models
 {
     public class Stock
     {
         public int Id { get; set; }
-        public string? ItemId { get; set; } 
+
+        [JsonProperty("item_id")]
+        public string? ItemId { get; set; }
+        [JsonProperty("amount")]
         public int Quantity { get; set; }
 
     }

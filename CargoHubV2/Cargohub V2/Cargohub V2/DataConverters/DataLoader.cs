@@ -185,6 +185,16 @@
             context.Transfers.AddRange(transfers);
             context.SaveChanges();
 
+            var locations = LoadDataFromFile<Location>("data/locations.json");
+            foreach (var location in locations)
+            {
+                location.CreatedAt = ToUtc(location.CreatedAt);
+                location.UpdatedAt = ToUtc(location.UpdatedAt);
+                location.Id = 0; // Resetting the Id to 0
+            }
+            context.Locations.AddRange(locations);
+            context.SaveChanges();
+
             // Load Stocks from Shipments
             foreach (var shipment in shipments)
             {
