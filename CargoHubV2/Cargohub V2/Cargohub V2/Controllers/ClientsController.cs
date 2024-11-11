@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Cargohub_V2.Models;
 using Cargohub_V2.Services;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Cargohub_V2.Controllers
 {
@@ -30,11 +31,15 @@ namespace Cargohub_V2.Controllers
         public async Task<ActionResult<Client>> GetClientById(int id)
         {
             var client = await _clientsService.GetClientByIdAsync(id);
+            if (client == null)
+            {
+                return NoContent();
+            }
             return Ok(client);
         }
 
         // POST: api/Clients/AddClient
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<IActionResult> CreateClient([FromBody] Client client)
         {
             // Validate the model
@@ -50,6 +55,53 @@ namespace Cargohub_V2.Controllers
             }
 
             return CreatedAtAction(nameof(GetClientById), new { id = createdClient.Id }, createdClient);
+        }
+
+        //PUT: api/Clients/Update/{id}
+        [HttpPut("Update/{id}")] // Route parameter
+        public async Task<IActionResult> UpdateClient(int id, [FromBody] Client client)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var updatedClient = await _clientsService.UpdateClientAsync(client, id);
+            if (updatedClient == null)
+            {
+                return NoContent();
+            }
+            return Ok(updatedClient);
+        }
+
+        // DElETE: api/Clients/{id}
+        [HttpDelete("Delete/{id}")] // Route parameter
+        public async Task<IActionResult> RemoveClientById(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var client = await _clientsService.RemoveClientByIdAsync(id);
+            if (client == null)
+            {
+                return NoContent();
+            }
+            return Ok(client);
+        }
+
+        [HttpDelete("Delete/Email/{email}")] // Route parameter
+        public async Task<IActionResult> RemoveClientByEmail(string email)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var client = await _clientsService.RemoveClientByEmailAsync(email);
+            if (client == null)
+            {
+                return NoContent();
+            }
+            return Ok(client);
         }
 
     }

@@ -45,5 +45,60 @@ namespace Cargohub_V2.Services
 
             return client;
         }
+
+        public async Task<Client> UpdateClientAsync(Client client, int id)
+        {
+            var existingClient = await _context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (existingClient == null)
+            {
+                return null;
+            }
+
+            existingClient.Name = client.Name;
+            existingClient.Address = client.Address;
+            existingClient.City = client.City;
+            existingClient.ZipCode = client.ZipCode;
+            existingClient.Province = client.Province;
+            existingClient.Country = client.Country;
+            existingClient.ContactName = client.ContactName;
+            existingClient.ContactPhone = client.ContactPhone;
+            existingClient.ContactEmail = client.ContactEmail;
+
+            DateTime UpdatedAt = DateTime.UtcNow;
+            existingClient.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+
+            _context.Clients.Update(existingClient);
+            await _context.SaveChangesAsync();
+
+            return existingClient;
+        }
+
+        public async Task<Client> RemoveClientByIdAsync(int id)
+        {
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (client == null)
+            {
+                return null;
+            }
+
+            _context.Clients.Remove(client);
+            await _context.SaveChangesAsync();
+            return client;
+        }
+        public async Task<Client> RemoveClientByEmailAsync(string email)
+        {
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.ContactEmail == email);
+
+            if (client == null)
+            {
+                return null;
+            }
+
+            _context.Clients.Remove(client);
+            await _context.SaveChangesAsync();
+            return client;
+        }
     }
 }
