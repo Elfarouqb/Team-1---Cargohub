@@ -1,17 +1,28 @@
 using Cargohub_V2.Contexts;
 using Cargohub_V2.DataConverters;
 using Microsoft.EntityFrameworkCore;
+using Cargohub_V2.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<CargoHubDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
+
+
+builder.Services.AddScoped<ItemGroupService>();
+builder.Services.AddScoped<ItemLineService>();
+builder.Services.AddScoped<ClientsService>();
+
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+
 var app = builder.Build();
-if(args.Length > 0 && args[0] == "seed")
+if (args.Length > 0 && args[0] == "seed")
 {
     SeedData1(app);
 }
