@@ -30,5 +30,20 @@ namespace Cargohub_V2.Services
             }
             return null;
         }
+
+        public async Task<Client> CreateClientAsync(Client client)
+        {
+            DateTime CreatedAt = DateTime.UtcNow;
+            DateTime UpdatedAt = DateTime.UtcNow;
+
+            client.CreatedAt = new DateTime(CreatedAt.Year, CreatedAt.Month, CreatedAt.Day, CreatedAt.Hour, CreatedAt.Minute, CreatedAt.Second, DateTimeKind.Utc);
+            client.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+
+            // Add the new client
+            _context.Clients.Add(client);
+            await _context.SaveChangesAsync();
+
+            return client;
+        }
     }
 }
