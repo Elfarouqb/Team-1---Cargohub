@@ -38,7 +38,7 @@ namespace Cargohub_V2.Controllers
             return Ok(client);
         }
 
-        // POST: api/Clients/AddClient
+        // POST: api/Clients/Add
         [HttpPost("Add")]
         public async Task<IActionResult> CreateClient([FromBody] Client client)
         {
