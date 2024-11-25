@@ -59,7 +59,7 @@ def test_get_orders_in_shipment(_url):
 
     assert status_code == 200
     assert isinstance(response_data, list)
-    assert all('id' in order for order in response_data)  # Each order should have an 'id' field
+    assert all('id' in order for order in response_data)  # alle order id's moeten een id hebben
 
 
 def test_get_orders_for_client(_url):
