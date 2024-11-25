@@ -1,7 +1,7 @@
 import socketserver
 import http.server
 import json
-
+import logging
 from providers import auth_provider
 from providers import data_provider
 
@@ -9,9 +9,14 @@ from processors import notification_processor
 
 
 class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
+    logging.basicConfig(
+    filename='app.log',  # This is the log file name
+    level=logging.DEBUG,  # Set the log level to DEBUG
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Log message format
+)
 
     def handle_get_version_1(self, path, user):
-        print(f"Incoming path: {path}")
+        logging.debug(f"Path components: {path}")
         if not auth_provider.has_access(user, path, "get"):
             self.send_response(403)
             self.end_headers()
@@ -389,9 +394,11 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             try:
                 path = self.path.split("/")
+                logging.debug(f"Path components: {path}")
                 if len(path) > 3 and path[1] == "api" and path[2] == "v1":
                     self.handle_get_version_1(path[3:], user)
-            except Exception:
+            except Exception as e:
+                logging.error(f"Exception occurred: {e}")
                 self.send_response(500)
                 self.end_headers()
 
@@ -486,6 +493,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             try:
                 path = self.path.split("/")
+                logging.debug(f"Path components: {path}")
                 if len(path) > 3 and path[1] == "api" and path[2] == "v1":
                     self.handle_post_version_1(path[3:], user)
             except Exception:
@@ -700,6 +708,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             try:
                 path = self.path.split("/")
+                logging.debug(f"Path components: {path}")
                 if len(path) > 3 and path[1] == "api" and path[2] == "v1":
                     self.handle_put_version_1(path[3:], user)
             except Exception:
@@ -787,7 +796,10 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+    
+
     def do_DELETE(self):
+        
         api_key = self.headers.get("API_KEY")
         user = auth_provider.get_user(api_key)
         if user == None:
@@ -796,9 +808,11 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         else:
             try:
                 path = self.path.split("/")
+                logging.debug(f"Path components: {path}")              
                 if len(path) > 3 and path[1] == "api" and path[2] == "v1":
                     self.handle_delete_version_1(path[3:], user)
-            except Exception:
+            except Exception as e:
+                logging.error(f"Exception occurred: {e}")
                 self.send_response(500)
                 self.end_headers()
 
