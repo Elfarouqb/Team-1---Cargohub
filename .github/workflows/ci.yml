@@ -1,4 +1,4 @@
-name: CargoHub Refactor Workflow
+name: CargoHub CI Workflow
 
 on:
   push:
