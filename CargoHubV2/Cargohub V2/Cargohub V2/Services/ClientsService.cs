@@ -31,6 +31,16 @@ namespace Cargohub_V2.Services
             return null;
         }
 
+        public async Task<Client> GetClientByEmailAsync(string email)
+        {
+            var possibleClient = await _context.Clients.FirstOrDefaultAsync(c => c.ContactEmail == email);
+            if (possibleClient != null)
+            {
+                return possibleClient;
+            }
+            return null;
+        }
+
         public async Task<Client> CreateClientAsync(Client client)
         {
             DateTime CreatedAt = DateTime.UtcNow;
