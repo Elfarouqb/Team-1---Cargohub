@@ -20,14 +20,14 @@ namespace Cargohub_V2.Services
         public async Task<List<Shipment>> GetAllShipmentsAsync()
         {
             return await _context.Shipments
-                .Include(s => s.Stocks) // Eager load related Stocks
+                .Include(s => s.Stocks)
                 .ToListAsync();
         }
 
         public async Task<Shipment?> GetShipmentByIdAsync(int shipmentId)
         {
             return await _context.Shipments
-                .Include(s => s.Stocks) // Include related Stocks
+                .Include(s => s.Stocks)
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
         }
 
@@ -50,7 +50,7 @@ namespace Cargohub_V2.Services
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
             var existingShipment = await _context.Shipments
-                .Include(s => s.Stocks) // Include related Stocks
+                .Include(s => s.Stocks)
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
@@ -58,7 +58,7 @@ namespace Cargohub_V2.Services
                 return false;
             }
 
-            // Update fields
+            //update database
             existingShipment.OrderId = updatedShipment.OrderId;
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
