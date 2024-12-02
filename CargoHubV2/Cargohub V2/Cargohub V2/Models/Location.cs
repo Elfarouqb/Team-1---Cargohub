@@ -17,6 +17,10 @@ namespace Cargohub_V2.Models
         [JsonProperty("name")]
         public string? Name { get; set; }
 
+        [JsonProperty("quantity_on_hand")]
+        public int QuantityOnHand { get; set;}
+
+
         [JsonProperty("created_at")]
         [JsonConverter(typeof(FlexibleDateTimeConverter))]
         public DateTime CreatedAt { get; set; }

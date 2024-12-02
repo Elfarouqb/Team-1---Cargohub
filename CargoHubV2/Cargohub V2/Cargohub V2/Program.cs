@@ -14,6 +14,12 @@ builder.Services.AddDbContext<CargoHubDbContext>(options =>
 builder.Services.AddScoped<ItemGroupService>();
 builder.Services.AddScoped<ItemLineService>();
 builder.Services.AddScoped<ClientsService>();
+builder.Services.AddScoped<InventoryService>();
+builder.Services.AddScoped<LocationService>();
+builder.Services.AddScoped<SuppliersService>();
+
+
+
 
 
 

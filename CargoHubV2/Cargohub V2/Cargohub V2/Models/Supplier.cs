@@ -48,5 +48,8 @@ namespace Cargohub_V2.Models
         [JsonProperty("updated_at")]
         [JsonConverter(typeof(FlexibleDateTimeConverter))]
         public DateTime UpdatedAt { get; set; }
+
+        [JsonProperty("price")]
+        public int Price { get; set; }
     }
 }
