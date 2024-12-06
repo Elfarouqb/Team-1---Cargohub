@@ -17,6 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Debug directory structure
+      - name: List Files
+        run: ls -R
+        working-directory: CargoHubV2
+
       # Set up .NET SDK
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
@@ -33,24 +38,23 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
-          pip install requests
+          pip install pytest requests
 
       # Restore .NET dependencies
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: Cargohub V2\Cargohub V2\Tests
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Build the application
       - name: Build
         run: dotnet build --no-restore
-        working-directory: Cargohub V2\Cargohub V2\Tests
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Start the ASP.NET application in the background
       - name: Start ASP.NET application in background
         run: |
           nohup dotnet run --urls=http://localhost:5285 > output.log 2>&1 &
-        working-directory: Cargohub V2\Cargohub V2\Tests
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Wait for the ASP.NET application to start
       - name: Wait for ASP.NET application to start
@@ -68,5 +72,4 @@ jobs:
       # Run Python Integration Tests
       - name: Run Python Integration Tests
         run: pytest
-        working-directory: Cargohub V2\Cargohub V2\Tests
-
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2/Tests
