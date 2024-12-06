@@ -39,10 +39,34 @@ namespace Cargohub_V2.Controllers
             return Ok(itemGroup);
         }
 
-        // POST: api/ItemGroups
-        [HttpPost]
+        // GET: api/ItemGroups/ByName/name
+        [HttpGet("ByName/{name}")]
+        public async Task<ActionResult<Item_Group>> GetItemGroupByName(string name)
+        {
+            var itemGroup = await _itemGroupService.GetItemGroupByNameAsync(name);
+
+            if (itemGroup == null)
+            {
+                return NotFound(new { Message = $"Item group with Name: {name} not found." });
+            }
+
+            return Ok(itemGroup);
+        }
+
+        // POST: api/ItemGroups/Add
+        [HttpPost("Add")]
         public async Task<ActionResult<Item_Group>> AddItemGroup([FromBody] Item_Group itemGroup)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (_itemGroupService.GetItemGroupByNameAsync(itemGroup.Name).Result != null)
+            {
+                return BadRequest("Item Group with this name already exists");
+            }
+
             var createdItemGroup = await _itemGroupService.AddItemGroupAsync(itemGroup);
             return CreatedAtAction(nameof(GetItemGroupById), new { id = createdItemGroup.Id }, createdItemGroup);
         }
@@ -58,26 +82,24 @@ namespace Cargohub_V2.Controllers
                 return NotFound(new { Message = $"Item group with ID {id} not found." });
             }
 
-            return NoContent();
+            return Ok("Item group deleted successfully");
         }
 
         // PUT: api/ItemGroups/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItemGroup(int id, [FromBody] Item_Group updatedItemGroup)
+        public async Task<IActionResult> UpdateItemGroup(int id, [FromBody] Item_Group ItemGroup)
         {
-            if (id != updatedItemGroup.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { Message = "ID in the URL does not match the ID in the payload." });
+                return BadRequest(ModelState);
+            }
+            var updatedItemGroup = await _itemGroupService.UpdateItemGroupAsync(id, ItemGroup);
+            if (updatedItemGroup == null)
+            {
+                return NoContent();
             }
 
-            var success = await _itemGroupService.UpdateItemGroupAsync(id, updatedItemGroup);
-
-            if (!success)
-            {
-                return NotFound(new { Message = $"Item group with ID {id} not found." });
-            }
-
-            return NoContent(); // Return 204 No Content if the update is successful
+            return Ok(updatedItemGroup);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Cargohub_V2.DataConverters;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace Cargohub_V2.Models
 {
@@ -8,6 +10,7 @@ namespace Cargohub_V2.Models
         [JsonProperty("id")]
         public int Id { get; set; }
 
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Numbers and special characters are not allowed")]
         [JsonProperty("name")]
         public string Name { get; set; }
 
