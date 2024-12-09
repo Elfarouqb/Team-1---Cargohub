@@ -89,21 +89,21 @@ namespace Cargohub_V2.Controllers
             return Ok(items);
         }
 
-        // POST: api/Items/Add
-        [HttpPost("Add")]
-        public async Task<ActionResult<Item>> AddItem([FromBody] Item newItem)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            if (_itemService.GetItemByUidAsync(newItem.UId).Result != null)
-            {
-                return BadRequest("Item with this UID already exists");
-            }
-            var createdItem = await _itemService.AddItemAsync(newItem);
-            return CreatedAtAction(nameof(GetItemById), new { id = createdItem.Id }, createdItem);
-        }
+        // // POST: api/Items/Add
+        // [HttpPost("Add")]
+        // public async Task<ActionResult<Item>> AddItem([FromBody] Item newItem)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
+        //     if (_itemService.GetItemByUidAsync(newItem.UId).Result != null)
+        //     {
+        //         return BadRequest("Item with this UID already exists");
+        //     }
+        //     var createdItem = await _itemService.AddItemAsync(newItem);
+        //     return CreatedAtAction(nameof(GetItemById), new { id = createdItem.Id }, createdItem);
+        // }
 
         // PUT: api/Items/{id}
         [HttpPut("{id}")]

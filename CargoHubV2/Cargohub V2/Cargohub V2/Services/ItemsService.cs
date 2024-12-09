@@ -77,37 +77,37 @@ namespace Cargohub_V2.Services
                 .FirstOrDefaultAsync(i => i.Supplier.Id == supplierId);
         }
 
-        public async Task<Item> AddItemAsync(Item newItem)
-        {
-            // Get the latest UID
-            var lastItem = await _context.Items
-                .OrderByDescending(i => i.UId)
-                .FirstOrDefaultAsync();
+        // public async Task<Item> AddItemAsync(Item newItem)
+        // {
+        //     // Get the latest UID
+        //     var lastItem = await _context.Items
+        //         .OrderByDescending(i => i.UId)
+        //         .FirstOrDefaultAsync();
 
-            // Generate UID (increment from last UID)
-            if (lastItem != null)
-            {
-                var lastUidNumericPart = int.Parse(lastItem.UId.Substring(1)); // Remove 'P' and parse number
-                newItem.UId = $"P{lastUidNumericPart + 1:D6}"; // Increment and format as P###### (e.g., P000002)
-            }
-            else
-            {
-                newItem.UId = "P000001"; // First UID
-            }
+        //     // Generate UID (increment from last UID)
+        //     if (lastItem != null)
+        //     {
+        //         var lastUidNumericPart = int.Parse(lastItem.UId.Substring(1)); // Remove 'P' and parse number
+        //         newItem.UId = $"P{lastUidNumericPart + 1:D6}"; // Increment and format as P###### (e.g., P000002)
+        //     }
+        //     else
+        //     {
+        //         newItem.UId = "P000001"; // First UID
+        //     }
 
-            // Generate Code (random alphanumeric string)
-            newItem.Code = GenerateUniqueCode();
+        //     // Generate Code (random alphanumeric string)
+        //     newItem.Code = GenerateUniqueCode();
 
-            DateTime CreatedAt = DateTime.UtcNow;
-            DateTime UpdatedAt = DateTime.UtcNow;
+        //     DateTime CreatedAt = DateTime.UtcNow;
+        //     DateTime UpdatedAt = DateTime.UtcNow;
 
-            newItem.CreatedAt = new DateTime(CreatedAt.Year, CreatedAt.Month, CreatedAt.Day, CreatedAt.Hour, CreatedAt.Minute, CreatedAt.Second, DateTimeKind.Utc);
-            newItem.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+        //     newItem.CreatedAt = new DateTime(CreatedAt.Year, CreatedAt.Month, CreatedAt.Day, CreatedAt.Hour, CreatedAt.Minute, CreatedAt.Second, DateTimeKind.Utc);
+        //     newItem.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
 
-            _context.Items.Add(newItem);
-            await _context.SaveChangesAsync();
-            return newItem;
-        }
+        //     _context.Items.Add(newItem);
+        //     await _context.SaveChangesAsync();
+        //     return newItem;
+        // }
 
         public async Task<bool> UpdateItemAsync(int id, Item updatedItem)
         {
