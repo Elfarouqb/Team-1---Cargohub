@@ -19,7 +19,6 @@ namespace Cargohub_V2.Models
         public string? City { get; set; }
 
         //added test for zip code, max amount symbols is 7 omdat langste in de wereld is UK en die is 7 symbols
-        [RegularExpression(@"^[A-Za-z0-9]{7}$", ErrorMessage = "Please enter a valid zip code")]
         [JsonProperty("zip_code")]
         public string? ZipCode { get; set; }
 

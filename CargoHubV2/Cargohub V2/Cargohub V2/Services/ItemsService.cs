@@ -23,6 +23,7 @@ namespace Cargohub_V2.Services
                 .Include(i => i.ItemGroup)
                 .Include(i => i.ItemType)
                 .Include(i => i.Supplier)
+                .Take(50)
                 .ToListAsync();
         }
 

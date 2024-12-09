@@ -44,17 +44,6 @@ namespace Cargohub_V2.Services
             return itemGroup;
         }
 
-        public async Task<bool> RemoveItemGroupAsync(int id)
-        {
-            var itemGroup = await _context.Items_Groups.FindAsync(id);
-
-            if (itemGroup == null)
-                return false;
-
-            _context.Items_Groups.Remove(itemGroup);
-            await _context.SaveChangesAsync();
-            return true;
-        }
         public async Task<Item_Group> UpdateItemGroupAsync(int id, Item_Group updatedItemGroup)
         {
             var existingItemGroup = await _context.Items_Groups.FindAsync(id);
@@ -76,5 +65,17 @@ namespace Cargohub_V2.Services
             return existingItemGroup;
         }
 
+
+        public async Task<bool> RemoveItemGroupAsync(int id)
+        {
+            var itemGroup = await _context.Items_Groups.FindAsync(id);
+
+            if (itemGroup == null)
+                return false;
+
+            _context.Items_Groups.Remove(itemGroup);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

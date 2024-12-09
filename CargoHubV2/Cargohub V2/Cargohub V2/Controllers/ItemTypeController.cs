@@ -39,31 +39,49 @@ namespace Cargohub_V2.Controllers
             return Ok(itemType);
         }
 
+        [HttpGet("ByName/{name}")] // Route parameter
+        public async Task<ActionResult<Item_Type>> GetItemTypeByName(string name)
+        {
+            var itemType = await _itemTypeService.GetItemTypeByNameAsync(name);
+            if (itemType == null)
+            {
+                return NotFound(new { Message = $"Item type with Name: {name} not found." });
+            }
+            return Ok(itemType);
+        }
+
         // POST: api/ItemTypes
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<ActionResult<Item_Type>> AddItemType([FromBody] Item_Type newItemType)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (_itemTypeService.GetItemTypeByNameAsync(newItemType.Name).Result != null)
+            {
+                return BadRequest("Item Type with this name already exists");
+            }
+
             var createdItemType = await _itemTypeService.AddItemTypeAsync(newItemType);
             return CreatedAtAction(nameof(GetItemTypeById), new { id = createdItemType.Id }, createdItemType);
         }
 
         // PUT: api/ItemTypes/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItemType(int id, [FromBody] Item_Type updatedItemType)
+        public async Task<IActionResult> UpdateItemType(int id, [FromBody] Item_Type itemType)
         {
-            if (id != updatedItemType.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { Message = "ID in the URL does not match the ID in the payload." });
+                return BadRequest(ModelState);
             }
 
-            var success = await _itemTypeService.UpdateItemTypeAsync(id, updatedItemType);
-
-            if (!success)
+            var updatedItemLine = await _itemTypeService.UpdateItemTypeAsync(id, itemType);
+            if (updatedItemLine == null)
             {
-                return NotFound(new { Message = $"Item type with ID {id} not found." });
+                return NoContent();
             }
-
-            return NoContent();
+            return Ok(updatedItemLine);
         }
 
         // DELETE: api/ItemTypes/{id}
@@ -77,7 +95,7 @@ namespace Cargohub_V2.Controllers
                 return NotFound(new { Message = $"Item type with ID {id} not found." });
             }
 
-            return NoContent();
+            return Ok("Item type deleted successfully");
         }
     }
 }

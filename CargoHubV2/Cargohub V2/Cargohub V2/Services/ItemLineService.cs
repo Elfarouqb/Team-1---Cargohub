@@ -17,7 +17,7 @@ namespace Cargohub_V2.Services
 
         public async Task<List<Item_Line>> GetAllItemLinesAsync()
         {
-            return await _context.Items_Lines.ToListAsync();
+            return await _context.Items_Lines.Take(100).ToListAsync();
         }
 
         public async Task<Item_Line> GetItemLineByIdAsync(int id)
@@ -25,28 +25,43 @@ namespace Cargohub_V2.Services
             return await _context.Items_Lines.FirstOrDefaultAsync(il => il.Id == id);
         }
 
+        public async Task<Item_Line> GetItemLineByNameAsync(string name)
+        {
+            return await _context.Items_Lines.FirstOrDefaultAsync(il => il.Name == name);
+        }
+
         public async Task<Item_Line> AddItemLineAsync(Item_Line newItemLine)
         {
+
+            DateTime CreatedAt = DateTime.UtcNow;
+            DateTime UpdatedAt = DateTime.UtcNow;
+
+            newItemLine.CreatedAt = new DateTime(CreatedAt.Year, CreatedAt.Month, CreatedAt.Day, CreatedAt.Hour, CreatedAt.Minute, CreatedAt.Second, DateTimeKind.Utc);
+            newItemLine.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+
             _context.Items_Lines.Add(newItemLine);
             await _context.SaveChangesAsync();
             return newItemLine;
         }
 
-        public async Task<bool> UpdateItemLineAsync(int id, Item_Line updatedItemLine)
+        public async Task<Item_Line> UpdateItemLineAsync(int id, Item_Line updatedItemLine)
         {
             var existingItemLine = await _context.Items_Lines.FindAsync(id);
 
             if (existingItemLine == null)
             {
-                return false;
+                return null;
             }
 
             existingItemLine.Name = updatedItemLine.Name;
             existingItemLine.Description = updatedItemLine.Description;
-            existingItemLine.UpdatedAt = DateTime.UtcNow; // Update timestamp
 
+            DateTime UpdatedAt = DateTime.UtcNow;
+            existingItemLine.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+
+            _context.Items_Lines.Update(existingItemLine);
             await _context.SaveChangesAsync();
-            return true;
+            return updatedItemLine;
         }
 
         public async Task<bool> DeleteItemLineAsync(int id)
