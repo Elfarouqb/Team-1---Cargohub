@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Cargohub_V2.Models;
 using Cargohub_V2.Services;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Cargohub_V2.Controllers
 {
@@ -26,14 +27,14 @@ namespace Cargohub_V2.Controllers
         }
 
         // GET: api/Items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Item>> GetItemById(int id)
+        [HttpGet("{uid}")]
+        public async Task<ActionResult<Item>> GetItemById(string uid)
         {
-            var item = await _itemService.GetItemByIdAsync(id);
+            var item = await _itemService.GetItemByUidAsync(uid);
 
             if (item == null)
             {
-                return NotFound(new { Message = $"Item with ID {id} not found." });
+                return NotFound(new { Message = $"Item with UID {uid} not found." });
             }
 
             return Ok(item);
@@ -44,14 +45,23 @@ namespace Cargohub_V2.Controllers
         public async Task<ActionResult<IEnumerable<Item>>> GetItemsByItemLine(int itemLineId)
         {
             var items = await _itemService.GetItemsByItemLineAsync(itemLineId);
+            if (items == null)
+            {
+                return NotFound();
+            }
             return Ok(items);
         }
+
 
         // GET: api/Items/ByItemGroup/{itemGroupId}
         [HttpGet("ByItemGroup/{itemGroupId}")]
         public async Task<ActionResult<IEnumerable<Item>>> GetItemsByItemGroup(int itemGroupId)
         {
             var items = await _itemService.GetItemsByItemGroupAsync(itemGroupId);
+            if (items == null)
+            {
+                return NotFound();
+            }
             return Ok(items);
         }
 
@@ -60,6 +70,10 @@ namespace Cargohub_V2.Controllers
         public async Task<ActionResult<IEnumerable<Item>>> GetItemsByItemType(int itemTypeId)
         {
             var items = await _itemService.GetItemsByItemTypeAsync(itemTypeId);
+            if (items == null)
+            {
+                return NotFound();
+            }
             return Ok(items);
         }
 
@@ -68,13 +82,25 @@ namespace Cargohub_V2.Controllers
         public async Task<ActionResult<IEnumerable<Item>>> GetItemsBySupplier(int supplierId)
         {
             var items = await _itemService.GetItemsBySupplierAsync(supplierId);
+            if (items == null)
+            {
+                return NotFound();
+            }
             return Ok(items);
         }
 
-        // POST: api/Items
-        [HttpPost]
+        // POST: api/Items/Add
+        [HttpPost("Add")]
         public async Task<ActionResult<Item>> AddItem([FromBody] Item newItem)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (_itemService.GetItemByUidAsync(newItem.UId).Result != null)
+            {
+                return BadRequest("Item with this UID already exists");
+            }
             var createdItem = await _itemService.AddItemAsync(newItem);
             return CreatedAtAction(nameof(GetItemById), new { id = createdItem.Id }, createdItem);
         }
