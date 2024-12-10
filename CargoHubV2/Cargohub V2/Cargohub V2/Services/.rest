@@ -1,1 +1,1 @@
-GET http://localhost:5285/api/shipments
+GET http://localhost:5285/api/Clients

@@ -18,7 +18,7 @@ namespace Cargohub_V2.Services
 
         public async Task<List<Client>> GetAllClientsAsync()
         {
-            return await _context.Clients.ToListAsync();
+            return await _context.Clients.Take(100).ToListAsync();
         }
 
         public async Task<Client> GetClientByIdAsync(int id)
@@ -109,6 +109,11 @@ namespace Cargohub_V2.Services
             _context.Clients.Remove(client);
             await _context.SaveChangesAsync();
             return client;
+        }
+
+        internal object Take(int v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

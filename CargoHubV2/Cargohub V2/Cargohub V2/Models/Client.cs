@@ -10,7 +10,6 @@ namespace Cargohub_V2.Models
         public int Id { get; set; }
 
         [JsonProperty("name")]
-        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Numbers and special characters are not allowed")]
         public string? Name { get; set; }
 
         [JsonProperty("address")]
@@ -19,6 +18,7 @@ namespace Cargohub_V2.Models
         [JsonProperty("city")]
         public string? City { get; set; }
 
+        //added test for zip code, max amount symbols is 7 omdat langste in de wereld is UK en die is 7 symbols
         [JsonProperty("zip_code")]
         public string? ZipCode { get; set; }
 
@@ -28,9 +28,11 @@ namespace Cargohub_V2.Models
         [JsonProperty("country")]
         public string? Country { get; set; }
 
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Numbers and special characters are not allowed")]
         [JsonProperty("contact_name")]
         public string? ContactName { get; set; }
 
+        [RegularExpression(@"^\+?(\d{1,4})?[\s\(\)-]?\d{1,4}[\s\(\)-]?\d{1,4}[\s\(\)-]?\d{1,4}$", ErrorMessage = "Please enter a valid phone number.")]
         [JsonProperty("contact_phone")]
         public string? ContactPhone { get; set; }
 
