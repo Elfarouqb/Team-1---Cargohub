@@ -18,12 +18,22 @@ namespace Cargohub_V2.Services
 
         public async Task<List<Client>> GetAllClientsAsync()
         {
-            return await _context.Clients.ToListAsync();
+            return await _context.Clients.Take(100).ToListAsync();
         }
 
         public async Task<Client> GetClientByIdAsync(int id)
         {
             var possibleClient = await _context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+            if (possibleClient != null)
+            {
+                return possibleClient;
+            }
+            return null;
+        }
+
+        public async Task<Client> GetClientByEmailAsync(string email)
+        {
+            var possibleClient = await _context.Clients.FirstOrDefaultAsync(c => c.ContactEmail == email);
             if (possibleClient != null)
             {
                 return possibleClient;
@@ -99,6 +109,11 @@ namespace Cargohub_V2.Services
             _context.Clients.Remove(client);
             await _context.SaveChangesAsync();
             return client;
+        }
+
+        internal object Take(int v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

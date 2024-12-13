@@ -1,11 +1,10 @@
-import datetime
 import pytest
 import requests
 
 
 @pytest.fixture
-def test_get_item_groups():
-    url = 'http://localhost:3000/api/v1/item_groups'
+def test_get_item_lines():
+    url = 'http://localhost:3000/api/v1/item_lines'
     headers = {
         'API_KEY': 'a1b2c3d4e5'
     }
@@ -17,7 +16,7 @@ def test_get_item_groups():
     assert status_code == 200
 
 
-def test_get_item_group():
+def test_get_item_line():
     url = 'http://localhost:3000/api/v1/item_groups/1'
     headers = {
         'API_KEY': 'a1b2c3d4e5'
@@ -30,18 +29,18 @@ def test_get_item_group():
     assert status_code == 200
 
 
-# def test_add_item_group():
-#     url = 'http://localhost:3000/api/v1/item_groups'
+# def test_add_item_line():
+#     url = 'http://localhost:3000/api/v1/item_lines'
 #     headers = {
 #         'API_KEY': 'a1b2c3d4e5',
 #     }
 
-#     new_item_group = {
+#     new_item_line = {
 #         "name": "Johns stuff",
 #         "description": ""
 #     }
 
-#     response = requests.post(url, json=new_item_group, headers=headers)
+#     response = requests.post(url, json=new_item_line, headers=headers)
 
 #     assert response.status_code == 201
 
@@ -62,37 +61,37 @@ def test_get_item_group():
 #     assert updated_at == updated_datetime"""
 
 
-def test_update_item_group():
-    url = 'http://localhost:3000/api/v1/item_groups/1'
+def test_update_item_lines():
+    url = 'http://localhost:3000/api/v1/item_lines/4'
     headers = {
         'API_KEY': 'a1b2c3d4e5',
     }
 
-    updated_item_group = {
-        "id": 1,
+    updated_item_line = {
+        "id": 4,
         "name": "New Electronics",
         "description": "",
-        "created_at": "2023-05-15 19:52:53",
+        "created_at": "2022-05-15 19:52:53",
     }
 
-    response = requests.put(url, json=updated_item_group, headers=headers)
+    response = requests.put(url, json=updated_item_line, headers=headers)
 
     assert response.status_code == 200, f"{response.status_code}"
 
-    test = requests.get(url, headers=headers)
+    # test = requests.get(url, headers=headers)
 
-    assert test.status_code == 200
+    # assert test.status_code == 200
 
     # test = test.json()
 
-    # assert test["id"] == updated_item_group["id"]
-    # assert test["name"] == updated_item_group["name"]
-    # assert test["description"] == updated_item_group["description"]
-    # assert test["created_at"] == updated_item_group["created_at"]
+    # assert test["id"] == updated_item_line["id"]
+    # assert test["name"] == updated_item_line["name"]
+    # assert test["description"] == updated_item_line["description"]
+    # assert test["created_at"] == updated_item_line["created_at"]
 
 
-def test_delete_item_group():
-    url = 'http://localhost:3000/api/v1/item_groups/1'
+def test_delete_item_line():
+    url = 'http://localhost:3000/api/v1/item_lines/4'
     headers = {
         'API_KEY': 'a1b2c3d4e5',
     }

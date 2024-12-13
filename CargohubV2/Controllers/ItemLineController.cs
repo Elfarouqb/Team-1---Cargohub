@@ -39,35 +39,55 @@ namespace Cargohub_V2.Controllers
             return Ok(itemLine);
         }
 
-        // POST: api/ItemLines
-        [HttpPost]
-        public async Task<ActionResult<Item_Line>> AddItemLine([FromBody] Item_Line newItemLine)
+        // GET: api/ItemLines/ByName/name
+        [HttpGet("ByName/{name}")] // Route parameter
+        public async Task<ActionResult<Item_Line>> GetItemLineByName(string name)
         {
-            var createdItemLine = await _itemLineService.AddItemLineAsync(newItemLine);
+            var itemLine = await _itemLineService.GetItemLineByNameAsync(name);
+            if (itemLine == null)
+            {
+                return NotFound(new { Message = $"Item line with Name: {name} not found." });
+            }
+            return Ok(itemLine);
+        }
+
+        // POST: api/ItemLines/Add
+        [HttpPost("Add")]
+        public async Task<ActionResult<Item_Line>> AddItemLine([FromBody] Item_Line ItemLine)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (_itemLineService.GetItemLineByNameAsync(ItemLine.Name).Result != null)
+            {
+                return BadRequest("Item Group with this name already exists");
+            }
+            var createdItemLine = await _itemLineService.AddItemLineAsync(ItemLine);
             return CreatedAtAction(nameof(GetItemLineById), new { id = createdItemLine.Id }, createdItemLine);
         }
 
         // PUT: api/ItemLines/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItemLine(int id, [FromBody] Item_Line updatedItemLine)
+        public async Task<IActionResult> UpdateItemLine(int id, [FromBody] Item_Line ItemLine)
         {
-            if (id != updatedItemLine.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { Message = "ID in the URL does not match the ID in the payload." });
+                return BadRequest(ModelState);
             }
 
-            var success = await _itemLineService.UpdateItemLineAsync(id, updatedItemLine);
-
-            if (!success)
+            var updatedItemLine = await _itemLineService.UpdateItemLineAsync(id, ItemLine);
+            if (updatedItemLine == null)
             {
-                return NotFound(new { Message = $"Item line with ID {id} not found." });
+                return NoContent();
             }
 
-            return NoContent();
+            return Ok(updatedItemLine);
         }
 
         // DELETE: api/ItemLines/{id}
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteItemLine(int id)
         {
             var success = await _itemLineService.DeleteItemLineAsync(id);
@@ -77,7 +97,7 @@ namespace Cargohub_V2.Controllers
                 return NotFound(new { Message = $"Item line with ID {id} not found." });
             }
 
-            return NoContent();
+            return Ok("Item group deleted successfully");
         }
     }
 }

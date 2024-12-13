@@ -37,6 +37,16 @@ namespace Cargohub_V2.Controllers
             }
             return Ok(client);
         }
+        [HttpGet("Email/{email}")] // Route parameter
+        public async Task<ActionResult<Client>> GetClientByEmail([FromRoute] string email)
+        {
+            var client = await _clientsService.GetClientByEmailAsync(email);
+            if (client == null)
+            {
+                return NoContent();
+            }
+            return Ok(client);
+        }
 
         // POST: api/Clients/Add
         [HttpPost("Add")]
@@ -47,13 +57,11 @@ namespace Cargohub_V2.Controllers
             {
                 return BadRequest(ModelState);  // Return validation errors
             }
-
-            var createdClient = await _clientsService.CreateClientAsync(client);
-            if (createdClient == null)
+            if (_clientsService.GetClientByEmailAsync(client.ContactEmail).Result != null)
             {
-                return Conflict("Client already exists.");
+                return BadRequest("Client already exists");
             }
-
+            var createdClient = await _clientsService.CreateClientAsync(client);
             return CreatedAtAction(nameof(GetClientById), new { id = createdClient.Id }, createdClient);
         }
 
@@ -73,7 +81,7 @@ namespace Cargohub_V2.Controllers
             return Ok(updatedClient);
         }
 
-        // DElETE: api/Clients/{id}
+        // DElETE: api/Clients/Delete/{id}
         [HttpDelete("Delete/{id}")] // Route parameter
         public async Task<IActionResult> RemoveClientById(int id)
         {
