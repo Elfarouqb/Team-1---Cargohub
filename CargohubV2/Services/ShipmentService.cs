@@ -59,7 +59,6 @@ namespace Cargohub_V2.Services
             }
 
             //update database
-            existingShipment.OrderId = updatedShipment.OrderId;
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;
@@ -80,19 +79,6 @@ namespace Cargohub_V2.Services
             return true;
         }
 
-        public async Task<bool> RemoveShipmentAsync(int shipmentId)
-        {
-            var shipment = await _context.Shipments.FindAsync(shipmentId);
-
-            if (shipment == null)
-            {
-                return false;
-            }
-
-            _context.Shipments.Remove(shipment);
-            await _context.SaveChangesAsync();
-            return true;
-        }
 
         public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentStock> updatedItems)
         {
@@ -107,6 +93,20 @@ namespace Cargohub_V2.Services
             shipment.Stocks.AddRange(updatedItems);
             shipment.UpdatedAt = DateTime.UtcNow;
 
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+                public async Task<bool> RemoveShipmentAsync(int shipmentId)
+        {
+            var shipment = await _context.Shipments.FindAsync(shipmentId);
+
+            if (shipment == null)
+            {
+                return false;
+            }
+
+            _context.Shipments.Remove(shipment);
             await _context.SaveChangesAsync();
             return true;
         }
