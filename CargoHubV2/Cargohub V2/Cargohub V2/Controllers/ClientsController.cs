@@ -19,10 +19,10 @@ namespace Cargohub_V2.Controllers
         }
 
         // GET: api/Clients
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Client>>> GetAllClients()
+        [HttpGet("page/{amount}")]
+        public async Task<ActionResult<IEnumerable<Client>>> GetAllClients(int amount)
         {
-            var clients = await _clientsService.GetAllClientsAsync();
+            var clients = await _clientsService.GetAllClientsAsync(amount);
             return Ok(clients);
         }
 
@@ -77,6 +77,10 @@ namespace Cargohub_V2.Controllers
             if (updatedClient == null)
             {
                 return NoContent();
+            }
+            if (_clientsService.GetClientByEmailAsync(client.ContactEmail).Result != null)
+            {
+                return BadRequest("Client already exists");
             }
             return Ok(updatedClient);
         }

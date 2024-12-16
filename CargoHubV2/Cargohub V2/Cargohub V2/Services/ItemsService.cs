@@ -38,37 +38,30 @@ namespace Cargohub_V2.Services
                 .Include(i => i.Supplier)
                 .FirstOrDefaultAsync(i => i.UId == uid);
         }
-        public async Task<Item?> GetItemsByItemLineAsync(int itemLineId)
+        public async Task<List<Item>> GetItemsByItemLineAsync(int itemLineId)
         {
             return await _context.Items
+                .Where(i => i.ItemLineId == itemLineId)
                 .Include(i => i.ItemLine)
-                .FirstOrDefaultAsync(i => i.ItemLine.Id == itemLineId);
-
-            // .Where(i => i.ItemLineId == itemLineId)
-            // .Include(i => i.ItemLine)
-            // .ToListAsync();
+                .ToListAsync();
         }
 
-        public async Task<Item?> GetItemsByItemGroupAsync(int itemGroupId)
+        public async Task<List<Item>> GetItemsByItemGroupAsync(int itemGroupId)
         {
             return await _context.Items
+                .Where(i => i.ItemGroupId == itemGroupId)
                 .Include(i => i.ItemGroup)
-                .FirstOrDefaultAsync(i => i.ItemGroup.Id == itemGroupId);
-
-            // .Where(i => i.ItemGroupId == itemGroupId)
-            // .Include(i => i.ItemGroup)
-            // .ToListAsync();
+                .ToListAsync();
         }
 
-        public async Task<Item?> GetItemsByItemTypeAsync(int itemTypeId)
+        public async Task<List<Item>> GetItemsByItemTypeAsync(int itemTypeId)
         {
             return await _context.Items
-            .Include(i => i.ItemType)
-            .FirstOrDefaultAsync(i => i.ItemType.Id == itemTypeId);
-            // .Where(i => i.ItemTypeId == itemTypeId)
-            // .Include(i => i.ItemType)
-            // .ToListAsync();
+                .Where(i => i.ItemTypeId == itemTypeId)
+                .Include(i => i.ItemType)
+                .ToListAsync();
         }
+
 
         public async Task<Item?> GetItemsBySupplierAsync(int supplierId)
         {
@@ -76,48 +69,69 @@ namespace Cargohub_V2.Services
                 .Include(i => i.Supplier)
                 .FirstOrDefaultAsync(i => i.Supplier.Id == supplierId);
         }
+        public async Task<Item?> GetItemByCodeAsync(string code)
+        {
+            return await _context.Items
+                .Include(i => i.Code)
+                .FirstOrDefaultAsync(i => i.Code == code);
+        }
 
-        // public async Task<Item> AddItemAsync(Item newItem)
-        // {
-        //     // Get the latest UID
-        //     var lastItem = await _context.Items
-        //         .OrderByDescending(i => i.UId)
-        //         .FirstOrDefaultAsync();
+        public async Task<Item> AddItemAsync(Item newItem)
+        {
+            System.Console.WriteLine(newItem.Id);
+            // Validate SupplierId
+            var supplierExists = await _context.Suppliers.FindAsync(newItem.SupplierId); //(s => s.Id == newItem.SupplierId);
+            if (supplierExists == null)
 
-        //     // Generate UID (increment from last UID)
-        //     if (lastItem != null)
-        //     {
-        //         var lastUidNumericPart = int.Parse(lastItem.UId.Substring(1)); // Remove 'P' and parse number
-        //         newItem.UId = $"P{lastUidNumericPart + 1:D6}"; // Increment and format as P###### (e.g., P000002)
-        //     }
-        //     else
-        //     {
-        //         newItem.UId = "P000001"; // First UID
-        //     }
+            {
+                throw new Exception($"Supplier with ID {newItem.SupplierId} does not exist.");
+            }
 
-        //     // Generate Code (random alphanumeric string)
-        //     newItem.Code = GenerateUniqueCode();
+            // Get the latest UID
+            var lastItem = await _context.Items
+                .OrderByDescending(i => i.UId)
+                .FirstOrDefaultAsync();
 
-        //     DateTime CreatedAt = DateTime.UtcNow;
-        //     DateTime UpdatedAt = DateTime.UtcNow;
+            // Generate UID (increment from last UID)
+            if (lastItem != null)
+            {
+                var lastUidNumericPart = int.Parse(lastItem.UId.Substring(1)); // Remove 'P' and parse number
+                newItem.UId = $"P{lastUidNumericPart + 1:D6}"; // Increment and format as P###### (e.g., P000002)
+            }
+            else
+            {
+                newItem.UId = "P000001"; // First UID
+            }
 
-        //     newItem.CreatedAt = new DateTime(CreatedAt.Year, CreatedAt.Month, CreatedAt.Day, CreatedAt.Hour, CreatedAt.Minute, CreatedAt.Second, DateTimeKind.Utc);
-        //     newItem.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+            // Generate Code (random alphanumeric string)
+            newItem.Code = GenerateUniqueCode();
 
-        //     _context.Items.Add(newItem);
-        //     await _context.SaveChangesAsync();
-        //     return newItem;
-        // }
+            DateTime CreatedAt = DateTime.UtcNow;
+            DateTime UpdatedAt = DateTime.UtcNow;
 
-        public async Task<bool> UpdateItemAsync(int id, Item updatedItem)
+            newItem.CreatedAt = new DateTime(CreatedAt.Year, CreatedAt.Month, CreatedAt.Day, CreatedAt.Hour, CreatedAt.Minute, CreatedAt.Second, DateTimeKind.Utc);
+            newItem.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
+
+            _context.Items.Add(newItem);
+            await _context.SaveChangesAsync();
+            return newItem;
+        }
+
+        public async Task<Item> UpdateItemAsync(int id, Item updatedItem)
         {
             var existingItem = await _context.Items.FindAsync(id);
 
             if (existingItem == null)
             {
-                return false;
+                return null;
             }
 
+
+            var supplierExists = await _context.Suppliers.AnyAsync(s => s.Id == updatedItem.SupplierId);
+            if (!supplierExists)
+            {
+                throw new Exception($"Supplier with ID {updatedItem.SupplierId} does not exist.");
+            }
             existingItem.UId = updatedItem.UId;
             existingItem.Code = updatedItem.Code;
             existingItem.Description = updatedItem.Description;
@@ -135,10 +149,11 @@ namespace Cargohub_V2.Services
             existingItem.SupplierCode = updatedItem.SupplierCode;
             existingItem.SupplierPartNumber = updatedItem.SupplierPartNumber;
 
-            existingItem.UpdatedAt = DateTime.UtcNow;
+            DateTime UpdatedAt = DateTime.UtcNow;
+            existingItem.UpdatedAt = new DateTime(UpdatedAt.Year, UpdatedAt.Month, UpdatedAt.Day, UpdatedAt.Hour, UpdatedAt.Minute, UpdatedAt.Second, DateTimeKind.Utc);
 
             await _context.SaveChangesAsync();
-            return true;
+            return updatedItem;
         }
 
         public async Task<bool> RemoveItemAsync(int id)
