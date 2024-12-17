@@ -229,7 +229,7 @@
                         };
                         context.Stocks.Add(stock);
                     }
-                    
+
                 }
             }
             context.SaveChanges();
@@ -249,7 +249,7 @@
                         };
                         context.Stocks.Add(stock);
                     }
-                    
+
                 }
             }
             context.SaveChanges();

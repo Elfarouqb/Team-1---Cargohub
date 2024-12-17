@@ -10,10 +10,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Cargohub_V2.Migrations
+namespace CargohubV2.Migrations
 {
     [DbContext(typeof(CargoHubDbContext))]
-    [Migration("20241110181433_m1")]
+    [Migration("20241217135929_m1")]
     partial class m1
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace Cargohub_V2.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -92,7 +92,7 @@ namespace Cargohub_V2.Migrations
                     b.Property<string>("ItemReference")
                         .HasColumnType("text");
 
-                    b.Property<List<int>>("Locations")
+                    b.PrimitiveCollection<List<int>>("Locations")
                         .HasColumnType("integer[]");
 
                     b.Property<int>("TotalAllocated")
