@@ -2,6 +2,8 @@ using Cargohub_V2.Contexts;
 using Cargohub_V2.DataConverters;
 using Microsoft.EntityFrameworkCore;
 using Cargohub_V2.Services;
+using System.Text.Json.Serialization;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +27,8 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
         options.JsonSerializerOptions.MaxDepth = 64;
-        options.JsonSerializerOptions.ReferenceHandler = null; // Disable reference handling
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Ignores circular references
+
     });
 builder.Services.AddEndpointsApiExplorer();
 
