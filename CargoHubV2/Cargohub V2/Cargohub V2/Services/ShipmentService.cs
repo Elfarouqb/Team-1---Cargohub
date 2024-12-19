@@ -42,10 +42,20 @@ namespace Cargohub_V2.Services
             newShipment.CreatedAt = DateTime.UtcNow;
             newShipment.UpdatedAt = DateTime.UtcNow;
 
-            _context.Shipments.Add(newShipment); // Automatically assigns an ID by the database.
+            // Ensure shipmentId is set for each item
+            if (newShipment.Items != null)
+            {
+                foreach (var item in newShipment.Items)
+                {
+                    item.ShipmentId = newShipment.Id;  // Set the ShipmentId explicitly
+                }
+            }
+
+            _context.Shipments.Add(newShipment);
             await _context.SaveChangesAsync();
             return newShipment;
         }
+
 
 
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)

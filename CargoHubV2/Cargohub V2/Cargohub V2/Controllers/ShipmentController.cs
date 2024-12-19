@@ -52,28 +52,22 @@ namespace Cargohub_V2.Controllers
                 return BadRequest();
             }
 
-            // Ensure ShipmentItems are added to the shipment
+            // Add the shipment to the database
+            await _shipmentService.AddShipmentAsync(shipment);
+
+            // Ensure the ShipmentId is set for the items
             if (shipment.Items != null && shipment.Items.Any())
             {
                 foreach (var item in shipment.Items)
                 {
-                    // Optionally validate the stock or item before adding
-                    if (string.IsNullOrEmpty(item.ItemId) || item.Amount <= 0)
-                    {
-                        return BadRequest("Invalid item data.");
-                    }
+                    item.ShipmentId = shipment.Id; // Set the correct ShipmentId
                 }
             }
 
-            // Set CreatedAt and UpdatedAt dates
-            shipment.CreatedAt = DateTime.UtcNow;
-            shipment.UpdatedAt = DateTime.UtcNow;
-
-            // Add the shipment with the items to the database
-            await _shipmentService.AddShipmentAsync(shipment);
-
             return CreatedAtAction(nameof(GetShipmentById), new { id = shipment.Id }, shipment);
         }
+
+
 
         [HttpPut("{shipmentId}")]
         public async Task<IActionResult> UpdateShipment(int shipmentId, [FromBody] Shipment updatedShipment)

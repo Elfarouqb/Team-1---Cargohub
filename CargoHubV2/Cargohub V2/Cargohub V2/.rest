@@ -40,15 +40,16 @@ Content-Type: application/json
   "items": [
     {
       "itemId": "P007435",
-      "amount": 23
+      "amount": 23,
+      "shipmentId": 0
     },
     {
       "itemId": "P009557",
-      "amount": 1
+      "amount": 1,
+      "shipmentId": 0
     }
   ]
 }
-
 
 ###
 
@@ -82,12 +83,12 @@ Content-Type: application/json
 
 [
   {
-    "itemId": 1,
+    "itemId": "P007435",
     "quantity": 10,
     "weight": 5.0
   },
   {
-    "itemId": 2,
+    "itemId": "P009557",
     "quantity": 20,
     "weight": 10.0
   }
