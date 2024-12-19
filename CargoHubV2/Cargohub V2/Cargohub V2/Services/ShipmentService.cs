@@ -80,7 +80,7 @@ namespace Cargohub_V2.Services
         }
 
 
-        public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<int> updatedItems)
+        public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentStock> updatedItems)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
 
@@ -89,17 +89,15 @@ namespace Cargohub_V2.Services
                 return false;
             }
 
-            // Update the Items list
-            shipment.Items.Clear();
-            shipment.Items.AddRange(updatedItems);
+            shipment.Stocks.Clear();
+            shipment.Stocks.AddRange(updatedItems);
             shipment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-
-        public async Task<bool> RemoveShipmentAsync(int shipmentId)
+                public async Task<bool> RemoveShipmentAsync(int shipmentId)
         {
             var shipment = await _context.Shipments.FindAsync(shipmentId);
 
