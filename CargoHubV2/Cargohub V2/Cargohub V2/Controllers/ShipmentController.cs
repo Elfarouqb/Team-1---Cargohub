@@ -65,14 +65,31 @@ namespace Cargohub_V2.Controllers
         [HttpPut("{shipmentId}/items")]
         public async Task<IActionResult> UpdateItemsInShipment(int shipmentId, [FromBody] List<ShipmentStock> updatedItems)
         {
-            var success = await _shipmentService.UpdateItemsInShipmentAsync(shipmentId, updatedItems);
+            if (updatedItems == null || updatedItems.Count == 0)
+            {
+                return BadRequest("No items provided to update.");
+            }
+
+            var (success, outOfStockItemIds) = await _shipmentService.UpdateItemsInShipmentAsync(shipmentId, updatedItems);
+
             if (!success)
             {
-                return NotFound();
+                if (outOfStockItemIds != null && outOfStockItemIds.Count > 0)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Some items are out of stock or do not have sufficient stock.",
+                        OutOfStockItemIds = outOfStockItemIds
+                    });
+                }
+
+                return NotFound("Shipment not found.");
             }
 
             return NoContent();
         }
+
+
 
         [HttpDelete("{shipmentId}")]
         public async Task<IActionResult> RemoveShipment(int shipmentId)
