@@ -1,4 +1,3 @@
-//shipmentservice
 using Cargohub_V2.Contexts;
 using Cargohub_V2.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,21 +19,21 @@ namespace Cargohub_V2.Services
         public async Task<List<Shipment>> GetAllShipmentsAsync()
         {
             return await _context.Shipments
-                .Include(s => s.Stocks)
+                .Include(s => s.Items) // Load the related ShipmentItems
                 .ToListAsync();
         }
 
         public async Task<Shipment?> GetShipmentByIdAsync(int shipmentId)
         {
             return await _context.Shipments
-                .Include(s => s.Stocks)
+                .Include(s => s.Items) // Load the related ShipmentItems
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
         }
 
-        public async Task<List<ShipmentStock>> GetItemsInShipmentAsync(int shipmentId)
+        public async Task<List<ShipmentItem>> GetItemsInShipmentAsync(int shipmentId)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
-            return shipment?.Stocks ?? new List<ShipmentStock>();
+            return shipment?.Items ?? new List<ShipmentItem>();
         }
 
         public async Task<Shipment> AddShipmentAsync(Shipment newShipment)
@@ -50,7 +49,7 @@ namespace Cargohub_V2.Services
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
             var existingShipment = await _context.Shipments
-                .Include(s => s.Stocks)
+                .Include(s => s.Items) // Ensure we load the existing items
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
@@ -58,7 +57,6 @@ namespace Cargohub_V2.Services
                 return false;
             }
 
-            //update database
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;
@@ -79,28 +77,26 @@ namespace Cargohub_V2.Services
             return true;
         }
 
-
-        public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentStock> updatedItems)
+        public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentItem> updatedItems)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
-
             if (shipment == null)
             {
                 return false;
             }
 
-            shipment.Stocks.Clear();
-            shipment.Stocks.AddRange(updatedItems);
+            // Clear existing items and add the new ones
+            shipment.Items.Clear();
+            shipment.Items.AddRange(updatedItems);
             shipment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-                public async Task<bool> RemoveShipmentAsync(int shipmentId)
+        public async Task<bool> RemoveShipmentAsync(int shipmentId)
         {
             var shipment = await _context.Shipments.FindAsync(shipmentId);
-
             if (shipment == null)
             {
                 return false;
@@ -111,4 +107,5 @@ namespace Cargohub_V2.Services
             return true;
         }
     }
+
 }

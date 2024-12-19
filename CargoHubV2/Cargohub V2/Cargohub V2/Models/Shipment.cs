@@ -1,4 +1,5 @@
 ﻿using Cargohub_V2.DataConverters;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace Cargohub_V2.Models
@@ -62,6 +63,20 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public List<ShipmentStock> Stocks { get; set; } = new List<ShipmentStock>();
+        public ICollection<ShipmentItem> Items { get; set; }
+
     }
+
+
+    public class ShipmentItem
+    {
+        public int Id { get; set; }
+        public string ItemId { get; set; }
+        public int Amount { get; set; }
+
+        // Foreign Key
+        public int ShipmentId { get; set; }
+        public Shipment Shipment { get; set; }
+    }
+
 }

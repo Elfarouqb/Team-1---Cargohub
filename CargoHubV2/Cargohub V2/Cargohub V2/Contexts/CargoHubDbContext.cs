@@ -43,7 +43,9 @@ namespace Cargohub_V2.Contexts
         public DbSet<Item_Type> Items_Types { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Shipment> Shipments { get; set; }
-        
+        public DbSet<ShipmentItem> ShipmentItems { get; set; }
+
+
 
     }
 }

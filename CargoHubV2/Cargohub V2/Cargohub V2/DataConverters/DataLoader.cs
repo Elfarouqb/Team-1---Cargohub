@@ -164,15 +164,33 @@
             context.SaveChanges();
 
             // Load Shipments
+            // Load Shipments and Items (in one go)
             var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
+
             foreach (var shipment in shipments)
             {
                 shipment.CreatedAt = ToUtc(shipment.CreatedAt);
                 shipment.UpdatedAt = ToUtc(shipment.UpdatedAt);
                 shipment.Id = 0; // Resetting the Id to 0
+
+                // Manually add items to the shipment
+                foreach (var item in shipment.Items)
+                {
+                    var shipmentItem = new ShipmentItem
+                    {
+                        ItemId = item.ItemId,
+                        Amount = item.Amount,
+                        ShipmentId = shipment.Id // Ensure the shipment ID is set
+                    };
+                    // Add the item to the ShipmentItems collection
+                    shipment.Items.Add(shipmentItem);
+                }
+
+                context.Shipments.Add(shipment); // Add shipment with items
             }
-            context.Shipments.AddRange(shipments);
+
             context.SaveChanges();
+
 
             // Load Transfers
             var transfers = LoadDataFromFile<Transfer>("data/transfers.json");
