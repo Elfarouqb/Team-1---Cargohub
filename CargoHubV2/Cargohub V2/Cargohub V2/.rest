@@ -40,16 +40,15 @@ Content-Type: application/json
   "items": [
     {
       "itemId": "P007435",
-      "amount": 23,
-      "shipmentId": 0
+      "amount": 23
     },
     {
       "itemId": "P009557",
-      "amount": 1,
-      "shipmentId": 0
+      "amount": 1
     }
   ]
 }
+
 
 ###
 

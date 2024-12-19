@@ -7,8 +7,10 @@ namespace Cargohub_V2.Models
 {
     public class Shipment
     {
-        [JsonProperty("id")]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Ensure that the Id is auto-generated
         public int Id { get; set; }
+
 
         [JsonProperty("order_id")]
         public int OrderId { get; set; }
