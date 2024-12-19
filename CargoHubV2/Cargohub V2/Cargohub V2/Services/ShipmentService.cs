@@ -59,7 +59,6 @@ namespace Cargohub_V2.Services
             }
 
             //update database
-            existingShipment.OrderId = updatedShipment.OrderId
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;
@@ -81,45 +80,24 @@ namespace Cargohub_V2.Services
         }
 
 
-        public async Task<(bool Success, List<int> OutOfStockItemIds)> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentStock> updatedItems)
+        public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentStock> updatedItems)
         {
-            // Get the shipment
             var shipment = await GetShipmentByIdAsync(shipmentId);
+
             if (shipment == null)
             {
-                return (false, null);
+                return false;
             }
 
-            // Validate stock availability
-            var outOfStockItemIds = new List<int>();
-            foreach (var item in updatedItems)
-            {
-                var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.ItemId == item.ItemId);
-                if (stock == null || stock.Quantity < item.Quantity)
-                {
-                    // Add the itemId to the list of out-of-stock items
-                    outOfStockItemIds.Add(item.ItemId);
-                }
-            }
-
-            // If there are out-of-stock items, return false with the item IDs
-            if (outOfStockItemIds.Count > 0)
-            {
-                return (false, outOfStockItemIds);
-            }
-
-            // Update shipment items
             shipment.Stocks.Clear();
             shipment.Stocks.AddRange(updatedItems);
             shipment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            return (true, null);
+            return true;
         }
 
-
-
-        public async Task<bool> RemoveShipmentAsync(int shipmentId)
+                public async Task<bool> RemoveShipmentAsync(int shipmentId)
         {
             var shipment = await _context.Shipments.FindAsync(shipmentId);
 
