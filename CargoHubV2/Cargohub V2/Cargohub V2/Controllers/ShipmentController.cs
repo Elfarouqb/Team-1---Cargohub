@@ -63,7 +63,7 @@ namespace Cargohub_V2.Controllers
         }
 
         [HttpPut("{shipmentId}/items")]
-        public async Task<IActionResult> UpdateItemsInShipment(int shipmentId, [FromBody] List<ShipmentStock> updatedItems)
+        public async Task<IActionResult> UpdateItemsInShipment(int shipmentId, [FromBody] List<int> updatedItems)
         {
             var success = await _shipmentService.UpdateItemsInShipmentAsync(shipmentId, updatedItems);
             if (!success)
@@ -73,6 +73,7 @@ namespace Cargohub_V2.Controllers
 
             return NoContent();
         }
+
 
         [HttpDelete("{shipmentId}")]
         public async Task<IActionResult> RemoveShipment(int shipmentId)

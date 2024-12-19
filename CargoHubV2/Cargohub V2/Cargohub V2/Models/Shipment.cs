@@ -62,6 +62,6 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public List<ShipmentStock> Stocks { get; set; } = new List<ShipmentStock>();
+        public List<int> Items { get; set; } = new List<int>();
     }
 }

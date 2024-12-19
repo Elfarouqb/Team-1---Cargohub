@@ -20,6 +20,7 @@ Accept: application/json
 # POST a new shipment
 POST http://localhost:5285/api/shipments
 Content-Type: application/json
+
 {
   "orderId": 8,
   "sourceId": 456,
@@ -41,10 +42,11 @@ Content-Type: application/json
 ###
 
 # PUT (update) an existing shipment by ID
-PUT http://localhost:5285/api/shipments/5
+PUT http://localhost:5285/api/shipments/1
 Content-Type: application/json
+
 {
-  "sourceId": 457,
+  "sourceId": 555,
   "orderDate": "2024-12-14T10:00:00Z",
   "requestDate": "2024-12-15T10:00:00Z",
   "shipmentDate": "2024-12-16T10:00:00Z",
@@ -63,24 +65,20 @@ Content-Type: application/json
 ###
 
 # PUT (update) items in a shipment by shipment ID
-PUT http://localhost:5285/api/shipments/5/items
+PUT http://localhost:5285/api/shipments/2/items
 Content-Type: application/json
+
 [
-  {
-    "itemId": 1,
-    "quantity": 10,
-    "weight": 5.0
-  },
-  {
-    "itemId": 2,
-    "quantity": 20,
-    "weight": 10.0
-  }
+  1,
+  2,
+  3,
+  4
 ]
+
 
 ###
 
 # DELETE a shipment by ID
 DELETE http://localhost:5285/api/shipments/1
 
-###
+
