@@ -65,6 +65,10 @@ namespace Cargohub_V2.Controllers
                 }
             }
 
+            // Set CreatedAt and UpdatedAt dates
+            shipment.CreatedAt = DateTime.UtcNow;
+            shipment.UpdatedAt = DateTime.UtcNow;
+
             // Add the shipment with the items to the database
             await _shipmentService.AddShipmentAsync(shipment);
 

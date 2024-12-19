@@ -433,6 +433,31 @@ namespace CargohubV2.Migrations
                     b.ToTable("Shipments");
                 });
 
+            modelBuilder.Entity("Cargohub_V2.Models.ShipmentItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ShipmentId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShipmentId");
+
+                    b.ToTable("ShipmentItems");
+                });
+
             modelBuilder.Entity("Cargohub_V2.Models.Stock", b =>
                 {
                     b.Property<int>("Id")
@@ -649,6 +674,17 @@ namespace CargohubV2.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("Cargohub_V2.Models.ShipmentItem", b =>
+                {
+                    b.HasOne("Cargohub_V2.Models.Shipment", "Shipment")
+                        .WithMany("Items")
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Shipment");
+                });
+
             modelBuilder.Entity("Cargohub_V2.Models.Warehouse", b =>
                 {
                     b.OwnsOne("Cargohub_V2.Models.Contact", "Contact", b1 =>
@@ -694,7 +730,7 @@ namespace CargohubV2.Migrations
             modelBuilder.Entity("Cargohub_V2.Models.ShipmentStock", b =>
                 {
                     b.HasOne("Cargohub_V2.Models.Shipment", "Shipment")
-                        .WithMany("Stocks")
+                        .WithMany()
                         .HasForeignKey("ShipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -720,7 +756,7 @@ namespace CargohubV2.Migrations
 
             modelBuilder.Entity("Cargohub_V2.Models.Shipment", b =>
                 {
-                    b.Navigation("Stocks");
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Cargohub_V2.Models.Transfer", b =>

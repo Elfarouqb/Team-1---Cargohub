@@ -33,23 +33,25 @@ namespace Cargohub_V2.Services
         public async Task<List<ShipmentItem>> GetItemsInShipmentAsync(int shipmentId)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
-            return shipment?.Items ?? new List<ShipmentItem>();
+            return shipment?.Items.ToList() ?? new List<ShipmentItem>(); // Convert ICollection to List explicitly
         }
+
 
         public async Task<Shipment> AddShipmentAsync(Shipment newShipment)
         {
             newShipment.CreatedAt = DateTime.UtcNow;
             newShipment.UpdatedAt = DateTime.UtcNow;
 
-            _context.Shipments.Add(newShipment);
+            _context.Shipments.Add(newShipment); // Automatically assigns an ID by the database.
             await _context.SaveChangesAsync();
             return newShipment;
         }
 
+
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
             var existingShipment = await _context.Shipments
-                .Include(s => s.Items) // Ensure we load the existing items
+                .Include(s => s.Items)  // Make sure to include the Items collection
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
@@ -57,6 +59,7 @@ namespace Cargohub_V2.Services
                 return false;
             }
 
+            // Update the existing shipment properties
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;
@@ -71,15 +74,21 @@ namespace Cargohub_V2.Services
             existingShipment.TransferMode = updatedShipment.TransferMode;
             existingShipment.TotalPackageCount = updatedShipment.TotalPackageCount;
             existingShipment.TotalPackageWeight = updatedShipment.TotalPackageWeight;
+
+            // Convert ICollection<ShipmentItem> to List<ShipmentItem> and assign
+            existingShipment.Items = updatedShipment.Items.ToList(); // This fixes the error
+
             existingShipment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return true;
         }
 
+
         public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentItem> updatedItems)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
+
             if (shipment == null)
             {
                 return false;
@@ -87,12 +96,18 @@ namespace Cargohub_V2.Services
 
             // Clear existing items and add the new ones
             shipment.Items.Clear();
-            shipment.Items.AddRange(updatedItems);
+
+            foreach (var item in updatedItems)
+            {
+                shipment.Items.Add(item);
+            }
+
             shipment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return true;
         }
+
 
         public async Task<bool> RemoveShipmentAsync(int shipmentId)
         {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
+
 namespace Cargohub_V2.Models
 {
     public class Shipment
@@ -71,12 +72,17 @@ namespace Cargohub_V2.Models
     public class ShipmentItem
     {
         public int Id { get; set; }
+
+        // This should be a string, not an integer, as the item_id in your JSON is a string
+        [JsonProperty("item_id")]
         public string ItemId { get; set; }
+
         public int Amount { get; set; }
 
         // Foreign Key
         public int ShipmentId { get; set; }
         public Shipment Shipment { get; set; }
     }
+
 
 }

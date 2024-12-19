@@ -49,11 +49,17 @@ app.Run();
 
 void SeedData1(IHost app)
 {
-    var scopedFactory = app.Services.GetServices<IServiceScopeFactory>();
+    // Use GetRequiredService to get a single IServiceScopeFactory instance
+    var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 
-    using (var scope = app.Services.CreateScope())
+    using (var scope = scopeFactory.CreateScope())
     {
         var services = scope.ServiceProvider;
-        DataLoader.ImportData(services.GetRequiredService<CargoHubDbContext>());
+        
+        // Now resolve the DbContext and other dependencies within the scope
+        var dbContext = services.GetRequiredService<CargoHubDbContext>();
+        
+        // Call your ImportData method
+        DataLoader.ImportData(dbContext);
     }
 }

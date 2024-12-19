@@ -6,13 +6,13 @@ Accept: application/json
 ###
 
 # GET a single shipment by ID
-GET http://localhost:5285/api/shipments/1
+GET http://localhost:5285/api/shipments/5
 Accept: application/json
 
 ###
 
 # GET items in a shipment by shipment ID
-GET http://localhost:5285/api/shipments/1/items
+GET http://localhost:5285/api/shipments/10/items
 Accept: application/json
 
 ###
@@ -20,6 +20,7 @@ Accept: application/json
 # POST a new shipment
 POST http://localhost:5285/api/shipments
 Content-Type: application/json
+
 {
   "orderId": 8,
   "sourceId": 456,
@@ -35,14 +36,26 @@ Content-Type: application/json
   "paymentType": "Prepaid",
   "transferMode": "Air",
   "totalPackageCount": 5,
-  "totalPackageWeight": 50.5
+  "totalPackageWeight": 50.5,
+  "items": [
+    {
+      "itemId": "P007435",
+      "amount": 23
+    },
+    {
+      "itemId": "P009557",
+      "amount": 1
+    }
+  ]
 }
+
 
 ###
 
 # PUT (update) an existing shipment by ID
 PUT http://localhost:5285/api/shipments/5
 Content-Type: application/json
+
 {
   "sourceId": 457,
   "orderDate": "2024-12-14T10:00:00Z",
@@ -60,11 +73,13 @@ Content-Type: application/json
   "totalPackageWeight": 70.0
 }
 
+
 ###
 
 # PUT (update) items in a shipment by shipment ID
 PUT http://localhost:5285/api/shipments/5/items
 Content-Type: application/json
+
 [
   {
     "itemId": 1,
@@ -77,6 +92,7 @@ Content-Type: application/json
     "weight": 10.0
   }
 ]
+
 
 ###
 

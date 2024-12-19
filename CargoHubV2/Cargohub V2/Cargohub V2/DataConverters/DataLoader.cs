@@ -34,7 +34,6 @@
             throw new JsonSerializationException($"Unable to parse '{dateStr}' as a date.");
         }
     }
-
     public class DataLoader
     {
 
@@ -166,14 +165,15 @@
             // Load Shipments
             // Load Shipments and Items (in one go)
             var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
-
             foreach (var shipment in shipments)
             {
+
                 shipment.CreatedAt = ToUtc(shipment.CreatedAt);
                 shipment.UpdatedAt = ToUtc(shipment.UpdatedAt);
-                shipment.Id = 0; // Resetting the Id to 0
 
-                // Manually add items to the shipment
+                // Create a temporary list to store the new items
+                var newItems = new List<ShipmentItem>();
+
                 foreach (var item in shipment.Items)
                 {
                     var shipmentItem = new ShipmentItem
@@ -182,14 +182,24 @@
                         Amount = item.Amount,
                         ShipmentId = shipment.Id // Ensure the shipment ID is set
                     };
-                    // Add the item to the ShipmentItems collection
-                    shipment.Items.Add(shipmentItem);
+
+                    // Add the created shipmentItem to the temporary list
+                    newItems.Add(shipmentItem);
+                }
+
+                // After the loop finishes, add the new items to the shipment
+                foreach (var newItem in newItems)
+                {
+                    shipment.Items.Add(newItem);
                 }
 
                 context.Shipments.Add(shipment); // Add shipment with items
             }
 
             context.SaveChanges();
+
+
+
 
 
             // Load Transfers
@@ -213,26 +223,9 @@
             context.Locations.AddRange(locations);
             context.SaveChanges();
 
-            // Load Stocks from Shipments
-            foreach (var shipment in shipments)
-            {
-                if (shipment.Stocks != null)
-                {
-                    foreach (var item in shipment.Stocks)
-                    {
-                        var stock = new ShipmentStock
-                        {
-                            ItemId = item.ItemId,
-                            Quantity = item.Quantity,
-                            ShipmentId = shipment.Id,
-                        };
-                        context.Stocks.Add(stock);
-                    }
-                }
-            }
-            context.SaveChanges();
-
             // Load Stocks from Transfers
+            var stocksToAdd = new List<TransferStock>();
+
             foreach (var transfer in transfers)
             {
                 if (transfer.Stocks != null)
@@ -245,11 +238,15 @@
                             Quantity = item.Quantity,
                             TransferId = transfer.Id,
                         };
-                        context.Stocks.Add(stock);
+                        stocksToAdd.Add(stock); // Add to a temporary list
                     }
-
                 }
             }
+
+
+            // After the loop finishes, add all items to the context at once
+            context.Stocks.AddRange(stocksToAdd);
+
             context.SaveChanges();
 
             // Load Stocks from Orders

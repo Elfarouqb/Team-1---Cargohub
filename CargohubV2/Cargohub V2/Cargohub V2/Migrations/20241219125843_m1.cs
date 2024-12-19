@@ -252,6 +252,27 @@ namespace CargohubV2.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ShipmentItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ItemId = table.Column<string>(type: "text", nullable: false),
+                    Amount = table.Column<int>(type: "integer", nullable: false),
+                    ShipmentId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShipmentItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ShipmentItems_Shipments_ShipmentId",
+                        column: x => x.ShipmentId,
+                        principalTable: "Shipments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Items",
                 columns: table => new
                 {
@@ -359,6 +380,11 @@ namespace CargohubV2.Migrations
                 column: "SupplierId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ShipmentItems_ShipmentId",
+                table: "ShipmentItems",
+                column: "ShipmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stocks_OrderId",
                 table: "Stocks",
                 column: "OrderId");
@@ -388,6 +414,9 @@ namespace CargohubV2.Migrations
 
             migrationBuilder.DropTable(
                 name: "Locations");
+
+            migrationBuilder.DropTable(
+                name: "ShipmentItems");
 
             migrationBuilder.DropTable(
                 name: "Stocks");
