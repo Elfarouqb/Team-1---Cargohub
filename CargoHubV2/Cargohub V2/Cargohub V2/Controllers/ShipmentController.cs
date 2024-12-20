@@ -49,23 +49,23 @@ namespace Cargohub_V2.Controllers
         {
             if (shipment == null)
             {
-                return BadRequest();
+                return BadRequest("Shipment cannot be null.");
             }
 
-            // Add the shipment to the database
-            await _shipmentService.AddShipmentAsync(shipment);
+            // Call the service to add the shipment
+            var createdShipment = await _shipmentService.AddShipmentAsync(shipment);
 
-            // Ensure the ShipmentId is set for the items
-            if (shipment.Items != null && shipment.Items.Any())
+            // Check if the shipment and its items were added correctly
+            if (createdShipment == null || createdShipment.Id <= 0)
             {
-                foreach (var item in shipment.Items)
-                {
-                    item.ShipmentId = shipment.Id; // Set the correct ShipmentId
-                }
+                return StatusCode(500, "Failed to create the shipment.");
             }
 
-            return CreatedAtAction(nameof(GetShipmentById), new { id = shipment.Id }, shipment);
+            // Return a CreatedAtAction response with a route to GetShipmentById
+            return CreatedAtAction(nameof(GetShipmentById), new { id = createdShipment.Id }, createdShipment);
         }
+
+
 
 
 

@@ -1,5 +1,9 @@
 ﻿using Cargohub_V2.DataConverters;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+
 using Newtonsoft.Json;
 
 
@@ -73,6 +77,8 @@ namespace Cargohub_V2.Models
 
     public class ShipmentItem
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [JsonProperty("item_id")]

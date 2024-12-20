@@ -12,13 +12,13 @@ Accept: application/json
 ###
 
 # GET items in a shipment by shipment ID
-GET http://localhost:5285/api/shipments/10/items
+GET http://localhost:5285/api/shipments/5/items
 Accept: application/json
 
 ###
 
 # POST a new shipment
-POST http://localhost:5285/api/shipments
+POST  http://localhost:5285/api/shipments
 Content-Type: application/json
 
 {
@@ -70,7 +70,17 @@ Content-Type: application/json
   "paymentType": "Collect",
   "transferMode": "Land",
   "totalPackageCount": 7,
-  "totalPackageWeight": 70.0
+  "totalPackageWeight": 70.0,
+    "items": [
+    {
+      "itemId": "P007435",
+      "amount": 23
+    },
+    {
+      "itemId": "P009557",
+      "amount": 1
+    }
+  ]
 }
 
 
