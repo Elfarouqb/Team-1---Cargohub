@@ -123,20 +123,55 @@
                 itemType.UpdatedAt = ToUtc(itemType.UpdatedAt);
                 itemType.Id = 0; // Resetting the Id to 0
             }
-            context.Items_Types.AddRange(itemTypes);
-            context.SaveChanges(); // Ensure Item Types are saved first
-
-            // Now Import Items
+            // Load the Items from the items.json file
             var items = LoadDataFromFile<Item>("data/items.json");
+
+            // Normalize the datetime fields
             foreach (var item in items)
             {
-                item.CreatedAt = ToUtc(item.CreatedAt);
-                item.UpdatedAt = ToUtc(item.UpdatedAt);
-                item.Id = 0; // Resetting the Id to 0
-                             // Optionally, ensure the ItemLineId and ItemTypeId are valid before adding
+                item.CreatedAt = ToUtc(item.CreatedAt);  // Convert to UTC if necessary
+                item.UpdatedAt = ToUtc(item.UpdatedAt);  // Convert to UTC if necessary
+                item.Id = 0; // Resetting the Id to 0 before inserting into the database
             }
+
+            // Add the items to the database
             context.Items.AddRange(items);
-            context.SaveChanges();
+            context.SaveChanges(); // Save the items so they have their actual Ids assigned in the DB
+            // Load the Orders data from the orders.json file
+            var orders = LoadDataFromFile<Order>("data/orders.json");
+            // List to hold the OrderItems that will be inserted into the database
+            var orderItemsList = new List<OrderItem>();
+            // Loop through the orders and process the order items
+            foreach (var order in orders)
+            {
+                // Loop through each item in the order and populate OrderItems table
+                foreach (var orderItem in order.Items)
+                {
+                    // Ensure that the ItemId in OrderItems matches the Id from the Items table
+                    var item = context.Items.FirstOrDefault(i => i.UId == orderItem.ItemId);
+                    if (item != null)  // If we found a matching item
+                    {
+                        var orderItemEntity = new OrderItem
+                        {
+                            ItemId = item.Id,   // Set the ItemId to the Id from the Items table
+                            Amount = orderItem.Amount,
+                            OrderId = order.Id  // Set the OrderId from the current order
+                        };
+
+                        orderItemsList.Add(orderItemEntity);
+                    }
+                    else
+                    {
+                        // If no matching item is found, handle the error as needed, e.g., log it
+                        Console.WriteLine($"Item with UId {orderItem.ItemId} not found for OrderId {order.Id}");
+                    }
+                }
+            }
+
+            // Add all the order items to the database
+            context.OrderItems.AddRange(orderItemsList);
+            context.SaveChanges(); // Save the order items into the OrderItems table
+
 
             // Import Warehouses
             var warehouses = LoadDataFromFile<Warehouse>("data/warehouses.json");

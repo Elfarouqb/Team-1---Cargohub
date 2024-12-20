@@ -27,6 +27,8 @@ namespace Cargohub_V2.Contexts
             .HasValue<OrderStock>("Order")
             .HasValue<ShipmentStock>("Shipment")
             .HasValue<TransferStock>("Transfer");
+
+
         }
 
 
@@ -44,8 +46,7 @@ namespace Cargohub_V2.Contexts
         public DbSet<Order> Orders { get; set; }
         public DbSet<Shipment> Shipments { get; set; }
         public DbSet<ShipmentItem> ShipmentItems { get; set; }
-
-
+        public DbSet<OrderItem> OrderItems { get; set; }
 
     }
 }
