@@ -34,6 +34,7 @@
             throw new JsonSerializationException($"Unable to parse '{dateStr}' as a date.");
         }
     }
+
     public class DataLoader
     {
 
@@ -124,39 +125,19 @@
                 itemType.Id = 0; // Resetting the Id to 0
             }
             context.Items_Types.AddRange(itemTypes);
-            context.SaveChanges();
-            // Load the Items from the items.json file
-            var items = LoadDataFromFile<Item>("data/items.json");
+            context.SaveChanges(); // Ensure Item Types are saved first
 
-            // Normalize the datetime fields
+            // Now Import Items
+            var items = LoadDataFromFile<Item>("data/items.json");
             foreach (var item in items)
             {
-                item.CreatedAt = ToUtc(item.CreatedAt);  // Convert to UTC if necessary
-                item.UpdatedAt = ToUtc(item.UpdatedAt);  // Convert to UTC if necessary
-                item.Id = 0; // Resetting the Id to 0 before inserting into the database
+                item.CreatedAt = ToUtc(item.CreatedAt);
+                item.UpdatedAt = ToUtc(item.UpdatedAt);
+                item.Id = 0; // Resetting the Id to 0
+                             // Optionally, ensure the ItemLineId and ItemTypeId are valid before adding
             }
-
-            // Add the items to the database
             context.Items.AddRange(items);
-            context.SaveChanges(); // Save the items so they have their actual Ids assigned in the DB
-                                   // Load the Orders data from the orders.json file
-
-
-
-            // Loop through the orders and process the order items
-            var orders = LoadDataFromFile<Order>("data/orders.json");
-            foreach (var order in orders)
-            {
-                order.CreatedAt = ToUtc(order.CreatedAt);
-                order.UpdatedAt = ToUtc(order.UpdatedAt);
-                order.RequestDate = ToUtc(order.RequestDate);
-                order.OrderDate = ToUtc(order.OrderDate);
-                order.Id = 0; // Resetting the Id to 0
-            }
-            context.Orders.AddRange(orders);
             context.SaveChanges();
-
-
 
             // Import Warehouses
             var warehouses = LoadDataFromFile<Warehouse>("data/warehouses.json");
@@ -171,7 +152,6 @@
 
 
             // Load Shipments
-            // Load Shipments and Items (in one go)
             var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
             foreach (var shipment in shipments)
             {
@@ -206,7 +186,6 @@
 
             context.SaveChanges();
 
-
             // Load Transfers
             var transfers = LoadDataFromFile<Transfer>("data/transfers.json");
             foreach (var transfer in transfers)
@@ -228,9 +207,39 @@
             context.Locations.AddRange(locations);
             context.SaveChanges();
 
-            // Load Stocks from Transfers
-            var stocksToAdd = new List<TransferStock>();
+            // Load Stocks from Shipments
+            context.SaveChanges();
 
+            var orders = LoadDataFromFile<Order>("data/orders.json");
+            foreach (var order in orders)
+            {
+                try
+                {
+                    order.CreatedAt = ToUtc(order.CreatedAt);
+                    order.UpdatedAt = ToUtc(order.UpdatedAt);
+                    order.RequestDate = ToUtc(order.RequestDate);
+                    order.OrderDate = ToUtc(order.OrderDate);
+                    order.Id = 0; // Resetting the Id to 0
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing order: {JsonConvert.SerializeObject(order)}\nException: {ex.Message}");
+                }
+            }
+
+            try
+            {
+                context.Orders.AddRange(orders);
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving orders: {ex.Message}");
+                throw;
+            }
+
+
+            // Load Stocks from Transfers
             foreach (var transfer in transfers)
             {
                 if (transfer.Stocks != null)
@@ -243,11 +252,15 @@
                             Quantity = item.Quantity,
                             TransferId = transfer.Id,
                         };
-                        stocksToAdd.Add(stock); // Add to a temporary list
+                        context.Stocks.Add(stock);
                     }
+
                 }
             }
+            context.SaveChanges();
 
+
+            // Load Stocks from Orders
         }
     }
 }

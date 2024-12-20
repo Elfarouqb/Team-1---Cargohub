@@ -20,7 +20,8 @@ builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ClientsService>();
 builder.Services.AddScoped<ShipmentService>();
 builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<OrderItemsProcessor>();
+
+
 
 
 builder.Services.AddControllers()
@@ -50,34 +51,12 @@ app.Run();
 
 void SeedData1(IHost app)
 {
-    // Use GetRequiredService to get a single IServiceScopeFactory instance
-    var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+    var scopedFactory = app.Services.GetServices<IServiceScopeFactory>();
 
-    using (var scope = scopeFactory.CreateScope())
+    using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
-
-        // Resolve the DbContext and the OrderItemsProcessor
-        var dbContext = services.GetRequiredService<CargoHubDbContext>();
-        var orderItemsProcessor = services.GetRequiredService<OrderItemsProcessor>();
-
-        // Load initial data into the database using DataLoader
-        DataLoader.ImportData(dbContext);
-
-        // Define the path to your JSON file
-        var orderJsonFilePath = "data/orders.json"; // Adjust this path based on your file location
-
-        try
-        {
-            // Process the order items from the JSON file
-            orderItemsProcessor.ProcessOrderItemsAsync(orderJsonFilePath).GetAwaiter().GetResult();
-            Console.WriteLine("Order items processed and loaded successfully.");
-        }
-        catch (Exception ex)
-        {
-            // Log any errors that occur during processing
-            Console.WriteLine($"An error occurred while processing order items: {ex.Message}");
-        }
+        DataLoader.ImportData(services.GetRequiredService<CargoHubDbContext>());
     }
 }
 

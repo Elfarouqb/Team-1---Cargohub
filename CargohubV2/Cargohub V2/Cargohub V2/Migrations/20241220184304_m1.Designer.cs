@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CargohubV2.Migrations
 {
     [DbContext(typeof(CargoHubDbContext))]
-    [Migration("20241220175229_m1")]
+    [Migration("20241220184304_m1")]
     partial class m1
     {
         /// <inheritdoc />
