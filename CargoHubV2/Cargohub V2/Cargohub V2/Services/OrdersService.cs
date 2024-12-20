@@ -1,4 +1,3 @@
-//orderservice
 using Cargohub_V2.Contexts;
 using Cargohub_V2.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,21 +19,21 @@ namespace Cargohub_V2.Services
         public async Task<List<Order>> GetAllOrdersAsync()
         {
             return await _context.Orders
-                .Include(o => o.Stocks)
+                .Include(o => o.OrderItems)  // Changed from Stocks to OrderItems
                 .ToListAsync();
         }
 
         public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             return await _context.Orders
-                .Include(o => o.Stocks)
+                .Include(o => o.OrderItems)  // Changed from Stocks to OrderItems
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
-        public async Task<List<OrderStock>> GetItemsInOrderAsync(int orderId)
+        public async Task<List<OrderItem>> GetItemsInOrderAsync(int orderId)  // Changed return type to List<OrderItem>
         {
             var order = await GetOrderByIdAsync(orderId);
-            return order?.Stocks ?? new List<OrderStock>();
+            return order?.OrderItems?.ToList() ?? new List<OrderItem>();  // Access OrderItems instead of Stocks
         }
 
         public async Task<List<Order>> GetOrdersForShipmentAsync(int shipmentId)
@@ -64,7 +63,7 @@ namespace Cargohub_V2.Services
         public async Task<bool> UpdateOrderAsync(int orderId, Order updatedOrder)
         {
             var existingOrder = await _context.Orders
-                .Include(o => o.Stocks)
+                .Include(o => o.OrderItems)  // Changed from Stocks to OrderItems
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (existingOrder == null)
@@ -72,7 +71,7 @@ namespace Cargohub_V2.Services
                 return false;
             }
 
-            //update all fiels
+            //update all fields
             existingOrder.SourceId = updatedOrder.SourceId;
             existingOrder.OrderDate = updatedOrder.OrderDate;
             existingOrder.RequestDate = updatedOrder.RequestDate;
@@ -111,5 +110,6 @@ namespace Cargohub_V2.Services
         }
     }
 }
+
 
 

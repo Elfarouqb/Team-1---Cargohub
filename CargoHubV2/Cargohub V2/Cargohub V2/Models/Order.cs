@@ -77,12 +77,19 @@ namespace Cargohub_V2.Models
     public class OrderItem
     {
         public int Id { get; set; }
+
+        // item_id in the JSON data corresponds to ItemId in the OrderItem model
+        [JsonProperty("item_id")]
         public int ItemId { get; set; }
+        public string UId { get; set; }
+
         public int OrderId { get; set; }
+
         public int Amount { get; set; }
 
+        // Link to Item, assuming you have this relationship set up
         public Item Item { get; set; }
-        public Order Order { get; set; }
     }
+
 
 }
