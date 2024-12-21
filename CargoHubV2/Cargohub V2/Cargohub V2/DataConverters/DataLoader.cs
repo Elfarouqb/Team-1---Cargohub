@@ -151,7 +151,30 @@
             context.SaveChanges();
 
 
-            // Load Shipments
+            // Load Transfers
+            var transfers = LoadDataFromFile<Transfer>("data/transfers.json");
+            foreach (var transfer in transfers)
+            {
+                transfer.CreatedAt = ToUtc(transfer.CreatedAt);
+                transfer.UpdatedAt = ToUtc(transfer.UpdatedAt);
+                transfer.Id = 0; // Resetting the Id to 0
+            }
+            context.Transfers.AddRange(transfers);
+            context.SaveChanges();
+
+            var locations = LoadDataFromFile<Location>("data/locations.json");
+            foreach (var location in locations)
+            {
+                location.CreatedAt = ToUtc(location.CreatedAt);
+                location.UpdatedAt = ToUtc(location.UpdatedAt);
+                location.Id = 0; // Resetting the Id to 0
+            }
+            context.Locations.AddRange(locations);
+            context.SaveChanges();
+
+            // Load Stocks from Shipments
+            context.SaveChanges();
+
             var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
             foreach (var shipment in shipments)
             {
@@ -186,57 +209,51 @@
 
             context.SaveChanges();
 
-            // Load Transfers
-            var transfers = LoadDataFromFile<Transfer>("data/transfers.json");
-            foreach (var transfer in transfers)
-            {
-                transfer.CreatedAt = ToUtc(transfer.CreatedAt);
-                transfer.UpdatedAt = ToUtc(transfer.UpdatedAt);
-                transfer.Id = 0; // Resetting the Id to 0
-            }
-            context.Transfers.AddRange(transfers);
-            context.SaveChanges();
-
-            var locations = LoadDataFromFile<Location>("data/locations.json");
-            foreach (var location in locations)
-            {
-                location.CreatedAt = ToUtc(location.CreatedAt);
-                location.UpdatedAt = ToUtc(location.UpdatedAt);
-                location.Id = 0; // Resetting the Id to 0
-            }
-            context.Locations.AddRange(locations);
-            context.SaveChanges();
-
-            // Load Stocks from Shipments
-            context.SaveChanges();
-
+            // Import Orders
+            // Load Orders
             var orders = LoadDataFromFile<Order>("data/orders.json");
             foreach (var order in orders)
             {
-                try
+                // Ensure the dates are converted to UTC
+                order.CreatedAt = ToUtc(order.CreatedAt);
+                order.UpdatedAt = ToUtc(order.UpdatedAt);
+                order.RequestDate = ToUtc(order.RequestDate);
+                order.OrderDate = ToUtc(order.OrderDate);
+
+                // Create a temporary list to store the new items
+                var newOrderItems = new List<OrderItem>();
+
+                foreach (var item in order.OrderItems)
                 {
-                    order.CreatedAt = ToUtc(order.CreatedAt);
-                    order.UpdatedAt = ToUtc(order.UpdatedAt);
-                    order.RequestDate = ToUtc(order.RequestDate);
-                    order.OrderDate = ToUtc(order.OrderDate);
-                    order.Id = 0; // Resetting the Id to 0
+                    var orderItem = new OrderItem
+                    {
+                        ItemId = item.ItemId,
+                        Amount = item.Amount,  // Assuming Amount is part of the order data
+                        OrderId = order.Id     // Link the order ID
+                    };
+
+                    // Add the created orderItem to the temporary list
+                    newOrderItems.Add(orderItem);
                 }
-                catch (Exception ex)
+
+                // After the loop finishes, add the new items to the order
+                foreach (var newItem in newOrderItems)
                 {
-                    Console.WriteLine($"Error processing order: {JsonConvert.SerializeObject(order)}\nException: {ex.Message}");
+                    // You can choose to add these to the order's Items collection if needed
+                    // order.Items.Add(newItem);
                 }
+
+                // Add the order to the context
+                context.Orders.Add(order);
+                context.SaveChanges();
+
+                // Add the order items to the context
+                context.OrderItems.AddRange(newOrderItems);
             }
 
-            try
-            {
-                context.Orders.AddRange(orders);
-                context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving orders: {ex.Message}");
-                throw;
-            }
+            // Save changes for both orders and order items
+            context.SaveChanges();
+
 
 
             // Load Stocks from Transfers

@@ -71,25 +71,23 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public ICollection<OrderItem> OrderItems { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
     }
 
     public class OrderItem
     {
         public int Id { get; set; }
 
-        // item_id in the JSON data corresponds to ItemId in the OrderItem model
-        [JsonProperty("item_id")]
-        public int ItemId { get; set; }
-        public string UId { get; set; }
+        [JsonProperty("item_id")] // Correct the JSON property mapping
+        public string ItemId { get; set; } // Use string instead of int since item_id seems to be a string
 
+        [JsonProperty("order_id")]
         public int OrderId { get; set; }
 
         public int Amount { get; set; }
-
-        // Link to Item, assuming you have this relationship set up
-        public Item Item { get; set; }
     }
+
 
 
 }

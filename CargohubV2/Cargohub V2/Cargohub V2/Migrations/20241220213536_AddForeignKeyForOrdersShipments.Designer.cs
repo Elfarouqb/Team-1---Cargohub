@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CargohubV2.Migrations
 {
     [DbContext(typeof(CargoHubDbContext))]
-    [Migration("20241220184304_m1")]
-    partial class m1
+    [Migration("20241220213536_AddForeignKeyForOrdersShipments")]
+    partial class AddForeignKeyForOrdersShipments
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -383,19 +383,14 @@ namespace CargohubV2.Migrations
                     b.Property<int>("Amount")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ItemId")
-                        .HasColumnType("integer");
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
 
                     b.HasIndex("OrderId");
 
@@ -709,19 +704,11 @@ namespace CargohubV2.Migrations
 
             modelBuilder.Entity("Cargohub_V2.Models.OrderItem", b =>
                 {
-                    b.HasOne("Cargohub_V2.Models.Item", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Cargohub_V2.Models.Order", null)
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("Cargohub_V2.Models.ShipmentItem", b =>
