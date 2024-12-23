@@ -26,7 +26,7 @@ public class UnitTest_Shipments
     {
         // Load configuration from appsettings.json
         var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory()) // Ensure the base path is correct
+            .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true); // Load appsettings.json
         _configuration = builder.Build();
 
@@ -35,19 +35,23 @@ public class UnitTest_Shipments
         var optionsBuilder = new DbContextOptionsBuilder<CargoHubDbContext>();
         optionsBuilder.UseNpgsql(connectionString);
 
-        _dbContext = new CargoHubDbContext(optionsBuilder.Options); // Correct usage of DbContextOptions
-    }}
+        _dbContext = new CargoHubDbContext(optionsBuilder.Options);
+
+        // Initialize services and controller
+        _shipmentService = new ShipmentService(_dbContext);
+        _controller = new ShipmentsController(_shipmentService);
+    }
 
     private Shipment CreateDummyShipment()
     {
-        // Create a new dummy shipment to use in tests with the new structure
+        // Create a new dummy shipment to use in tests
         var dummyShipment = new Shipment
         {
             OrderId = 8,
             SourceId = 456,
-            OrderDate = new DateTime(2024, 12, 13, 10, 0, 0, DateTimeKind.Utc),
-            RequestDate = new DateTime(2024, 12, 14, 10, 0, 0, DateTimeKind.Utc),
-            ShipmentDate = new DateTime(2024, 12, 15, 10, 0, 0, DateTimeKind.Utc),
+            OrderDate = "2024-12-24",
+            RequestDate = "2024-12-24",
+            ShipmentDate = "2024-12-24",
             ShipmentType = "Standard",
             ShipmentStatus = "Pending",
             Notes = "Handle with care",
@@ -115,9 +119,9 @@ public class UnitTest_Shipments
         {
             OrderId = 8888,
             SourceId = 457,
-            OrderDate = new DateTime(2024, 12, 16, 10, 0, 0, DateTimeKind.Utc),
-            RequestDate = new DateTime(2024, 12, 17, 10, 0, 0, DateTimeKind.Utc),
-            ShipmentDate = new DateTime(2024, 12, 18, 10, 0, 0, DateTimeKind.Utc),
+            OrderDate = "2024-12-24",
+            RequestDate = "2024-12-24",
+            ShipmentDate = "2024-12-24",
             ShipmentType = "Express",
             ShipmentStatus = "New",
             Notes = "Fragile",
