@@ -9,6 +9,9 @@ using Cargohub_V2.Controllers;
 using Cargohub_V2.Models;
 using Cargohub_V2.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection; // For DI support if needed
+
 
 [TestClass]
 public class UnitTest_Shipments
@@ -23,8 +26,8 @@ public class UnitTest_Shipments
     {
         // Load configuration from appsettings.json
         var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            .SetBasePath(Directory.GetCurrentDirectory()) // Ensure the base path is correct
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true); // Load appsettings.json
         _configuration = builder.Build();
 
         // Configure DbContext with the connection string
@@ -32,12 +35,8 @@ public class UnitTest_Shipments
         var optionsBuilder = new DbContextOptionsBuilder<CargoHubDbContext>();
         optionsBuilder.UseNpgsql(connectionString);
 
-        _dbContext = new CargoHubDbContext(optionsBuilder.Options);
-
-        // Initialize ShipmentService and Controller with the DbContext
-        _shipmentService = new ShipmentService(_dbContext);
-        _controller = new ShipmentsController(_shipmentService);
-    }
+        _dbContext = new CargoHubDbContext(optionsBuilder.Options); // Correct usage of DbContextOptions
+    }}
 
     private Shipment CreateDummyShipment()
     {
