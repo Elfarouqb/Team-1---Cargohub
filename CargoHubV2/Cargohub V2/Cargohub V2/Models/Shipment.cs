@@ -1,23 +1,20 @@
 ﻿using Cargohub_V2.DataConverters;
 using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-
-
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
-
 
 namespace Cargohub_V2.Models
 {
     public class Shipment
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Ensure that the Id is auto-generated
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] //auto-generated
         public int Id { get; set; }
 
-
         [JsonProperty("order_id")]
-        public int OrderId { get; set; }
+        [Column(TypeName = "jsonb")] //JSONB column in db
+        public List<int> OrderId { get; set; } = new List<int>();
 
         [JsonProperty("source_id")]
         public int SourceId { get; set; }
@@ -71,9 +68,7 @@ namespace Cargohub_V2.Models
 
         [JsonProperty("items")]
         public ICollection<ShipmentItem> Items { get; set; }
-
     }
-
 
     public class ShipmentItem
     {
@@ -90,5 +85,4 @@ namespace Cargohub_V2.Models
         [JsonProperty("shipment_id")]
         public int ShipmentId { get; set; } // This should link to the parent shipment
     }
-
 }

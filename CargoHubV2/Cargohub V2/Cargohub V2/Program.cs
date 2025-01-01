@@ -3,15 +3,18 @@ using Cargohub_V2.DataConverters;
 using Microsoft.EntityFrameworkCore;
 using Cargohub_V2.Services;
 using System.Text.Json.Serialization;
+using Npgsql;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+//dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+//dotnet add package Npgsql.Json.NET
 // Add services to the container.
 builder.Services.AddDbContext<CargoHubDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
+NpgsqlConnection.GlobalTypeMapper.EnableDynamicJson();
 
 builder.Services.AddScoped<ItemGroupService>();
 builder.Services.AddScoped<ItemLineService>();
@@ -33,6 +36,7 @@ builder.Services.AddControllers()
 
     });
 builder.Services.AddEndpointsApiExplorer();
+
 
 
 var app = builder.Build();

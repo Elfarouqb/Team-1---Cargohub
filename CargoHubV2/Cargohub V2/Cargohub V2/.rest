@@ -12,7 +12,7 @@ Accept: application/json
 ###
 
 # GET items in a shipment by shipment ID
-GET http://localhost:5285/api/shipments/5/items
+GET http://localhost:5285/api/shipments/10/items
 Accept: application/json
 
 ###

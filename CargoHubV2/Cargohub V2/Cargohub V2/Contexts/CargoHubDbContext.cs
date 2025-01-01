@@ -6,6 +6,7 @@ namespace Cargohub_V2.Contexts
     public class CargoHubDbContext : DbContext
     {
         protected readonly IConfiguration Configuration;
+
         public CargoHubDbContext(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -18,27 +19,34 @@ namespace Cargohub_V2.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure one-to-many relationship between Order and StockOfItems
-            // Configure relationships between entities here
+            // Configure JSONB field for OrderIds in Shipment
+            modelBuilder.Entity<Shipment>(entity =>
+            {
+                entity.Property(e => e.OrderId)
+                      .HasColumnType("jsonb"); // Map OrderIds to JSONB in the database
+            });
+
+            // Configure one-to-many relationship between Order and OrderItems
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.OrderItems)  // An Order has many OrderItems
                 .WithOne()                   // Each OrderItem has one Order
                 .HasForeignKey(oi => oi.OrderId) // Foreign key in OrderItem
                 .OnDelete(DeleteBehavior.Cascade); // Cascade delete for related OrderItems when Order is deleted
 
+            // Configure Warehouse contact ownership
             modelBuilder.Entity<Warehouse>()
                 .OwnsOne(w => w.Contact);
+
+            // Configure Stock discriminator
             modelBuilder.Entity<Stock>()
-            .ToTable("Stocks")
-            .HasDiscriminator<string>("StockType")
-            .HasValue<OrderStock>("Order")
-            .HasValue<ShipmentStock>("Shipment")
-            .HasValue<TransferStock>("Transfer");
-
-
+                .ToTable("Stocks")
+                .HasDiscriminator<string>("StockType")
+                .HasValue<OrderStock>("Order")
+                .HasValue<ShipmentStock>("Shipment")
+                .HasValue<TransferStock>("Transfer");
         }
 
-
+        // DbSet declarations
         public DbSet<Client> Clients { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
@@ -54,6 +62,6 @@ namespace Cargohub_V2.Contexts
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Shipment> Shipments { get; set; }
         public DbSet<ShipmentItem> ShipmentItems { get; set; }
-
     }
 }
+
