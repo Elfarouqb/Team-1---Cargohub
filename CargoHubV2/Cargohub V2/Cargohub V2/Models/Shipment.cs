@@ -1,12 +1,20 @@
 ﻿using Cargohub_V2.DataConverters;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+
 using Newtonsoft.Json;
+
 
 namespace Cargohub_V2.Models
 {
     public class Shipment
     {
-        [JsonProperty("id")]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Ensure that the Id is auto-generated
         public int Id { get; set; }
+
 
         [JsonProperty("order_id")]
         public int OrderId { get; set; }
@@ -62,6 +70,25 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public List<ShipmentStock> Stocks { get; set; } = new List<ShipmentStock>();
+        public ICollection<ShipmentItem> Items { get; set; }
+
     }
+
+
+    public class ShipmentItem
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [JsonProperty("item_id")]
+        public string ItemId { get; set; }
+
+        public int Amount { get; set; }
+
+        // Foreign Key
+        [JsonProperty("shipment_id")]
+        public int ShipmentId { get; set; } // This should link to the parent shipment
+    }
+
 }

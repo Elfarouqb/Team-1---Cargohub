@@ -71,6 +71,23 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public List<OrderStock> Stocks { get; set; } = new List<OrderStock>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
     }
+
+    public class OrderItem
+    {
+        public int Id { get; set; }
+
+        [JsonProperty("item_id")] // Correct the JSON property mapping
+        public string ItemId { get; set; } // Use string instead of int since item_id seems to be a string
+
+        [JsonProperty("order_id")]
+        public int OrderId { get; set; }
+
+        public int Amount { get; set; }
+    }
+
+
+
 }

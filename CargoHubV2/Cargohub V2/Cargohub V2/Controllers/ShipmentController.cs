@@ -1,9 +1,10 @@
-//shipmentcontroller
+
 using Cargohub_V2.Models;
 using Cargohub_V2.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 
 namespace Cargohub_V2.Controllers
 {
@@ -37,18 +38,36 @@ namespace Cargohub_V2.Controllers
         }
 
         [HttpGet("{shipmentId}/items")]
-        public async Task<ActionResult<List<ShipmentStock>>> GetItemsInShipment(int shipmentId)
+        public async Task<ActionResult<List<ShipmentItem>>> GetItemsInShipment(int shipmentId)
         {
             var items = await _shipmentService.GetItemsInShipmentAsync(shipmentId);
             return Ok(items);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddShipment([FromBody] Shipment newShipment)
+        public async Task<IActionResult> CreateShipment([FromBody] Shipment shipment)
         {
-            var createdShipment = await _shipmentService.AddShipmentAsync(newShipment);
-            return CreatedAtAction(nameof(GetShipmentById), new { shipmentId = createdShipment.Id }, createdShipment);
+            if (shipment == null)
+            {
+                return BadRequest("Shipment cannot be null.");
+            }
+
+            // Call the service to add the shipment
+            var createdShipment = await _shipmentService.AddShipmentAsync(shipment);
+
+            // Check if the shipment and its items were added correctly
+            if (createdShipment == null || createdShipment.Id <= 0)
+            {
+                return StatusCode(500, "Failed to create the shipment.");
+            }
+
+            // Return a CreatedAtAction response with a route to GetShipmentById
+            return CreatedAtAction(nameof(GetShipmentById), new { id = createdShipment.Id }, createdShipment);
         }
+
+
+
+
 
         [HttpPut("{shipmentId}")]
         public async Task<IActionResult> UpdateShipment(int shipmentId, [FromBody] Shipment updatedShipment)
@@ -63,7 +82,7 @@ namespace Cargohub_V2.Controllers
         }
 
         [HttpPut("{shipmentId}/items")]
-        public async Task<IActionResult> UpdateItemsInShipment(int shipmentId, [FromBody] List<ShipmentStock> updatedItems)
+        public async Task<IActionResult> UpdateItemsInShipment(int shipmentId, [FromBody] List<ShipmentItem> updatedItems)
         {
             var success = await _shipmentService.UpdateItemsInShipmentAsync(shipmentId, updatedItems);
             if (!success)

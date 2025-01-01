@@ -1,0 +1,21 @@
+HTTP/1.1 400 Bad Request
+Connection: close
+Content-Type: application/problem+json; charset=utf-8
+Date: Thu, 19 Dec 2024 14:35:14 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "Items[0].Shipment": [
+      "The Shipment field is required."
+    ],
+    "Items[1].Shipment": [
+      "The Shipment field is required."
+    ]
+  },
+  "traceId": "00-28f388c860b6a30f200d4334ea72c1c0-088c1f9f6eb92c8d-00"
+}

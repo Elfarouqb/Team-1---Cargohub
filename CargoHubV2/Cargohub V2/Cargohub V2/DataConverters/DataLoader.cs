@@ -150,29 +150,6 @@
             context.Warehouses.AddRange(warehouses);
             context.SaveChanges();
 
-            // Import Orders
-            var orders = LoadDataFromFile<Order>("data/orders.json");
-            foreach (var order in orders)
-            {
-                order.CreatedAt = ToUtc(order.CreatedAt);
-                order.UpdatedAt = ToUtc(order.UpdatedAt);
-                order.RequestDate = ToUtc(order.RequestDate);
-                order.OrderDate = ToUtc(order.OrderDate);
-                order.Id = 0; // Resetting the Id to 0
-            }
-            context.Orders.AddRange(orders);
-            context.SaveChanges();
-
-            // Load Shipments
-            var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
-            foreach (var shipment in shipments)
-            {
-                shipment.CreatedAt = ToUtc(shipment.CreatedAt);
-                shipment.UpdatedAt = ToUtc(shipment.UpdatedAt);
-                shipment.Id = 0; // Resetting the Id to 0
-            }
-            context.Shipments.AddRange(shipments);
-            context.SaveChanges();
 
             // Load Transfers
             var transfers = LoadDataFromFile<Transfer>("data/transfers.json");
@@ -196,23 +173,88 @@
             context.SaveChanges();
 
             // Load Stocks from Shipments
+            context.SaveChanges();
+
+            var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
             foreach (var shipment in shipments)
             {
-                if (shipment.Stocks != null)
+
+                shipment.CreatedAt = ToUtc(shipment.CreatedAt);
+                shipment.UpdatedAt = ToUtc(shipment.UpdatedAt);
+
+                // Create a temporary list to store the new items
+                var newItems = new List<ShipmentItem>();
+
+                foreach (var item in shipment.Items)
                 {
-                    foreach (var item in shipment.Stocks)
+                    var shipmentItem = new ShipmentItem
                     {
-                        var stock = new ShipmentStock
-                        {
-                            ItemId = item.ItemId,
-                            Quantity = item.Quantity,
-                            ShipmentId = shipment.Id,
-                        };
-                        context.Stocks.Add(stock);
-                    }
+                        ItemId = item.ItemId,
+                        Amount = item.Amount,
+                        ShipmentId = shipment.Id // Ensure the shipment ID is set
+                    };
+
+                    // Add the created shipmentItem to the temporary list
+                    newItems.Add(shipmentItem);
                 }
+
+                // After the loop finishes, add the new items to the shipment
+                foreach (var newItem in newItems)
+                {
+                    shipment.Items.Add(newItem);
+                }
+
+                context.Shipments.Add(shipment); // Add shipment with items
             }
+
             context.SaveChanges();
+
+            // Import Orders
+            // Load Orders
+            var orders = LoadDataFromFile<Order>("data/orders.json");
+            foreach (var order in orders)
+            {
+                // Ensure the dates are converted to UTC
+                order.CreatedAt = ToUtc(order.CreatedAt);
+                order.UpdatedAt = ToUtc(order.UpdatedAt);
+                order.RequestDate = ToUtc(order.RequestDate);
+                order.OrderDate = ToUtc(order.OrderDate);
+
+                // Create a temporary list to store the new items
+                var newOrderItems = new List<OrderItem>();
+
+                foreach (var item in order.OrderItems)
+                {
+                    var orderItem = new OrderItem
+                    {
+                        ItemId = item.ItemId,
+                        Amount = item.Amount,  // Assuming Amount is part of the order data
+                        OrderId = order.Id     // Link the order ID
+                    };
+
+                    // Add the created orderItem to the temporary list
+                    newOrderItems.Add(orderItem);
+                }
+
+                // After the loop finishes, add the new items to the order
+                foreach (var newItem in newOrderItems)
+                {
+                    // You can choose to add these to the order's Items collection if needed
+                    // order.Items.Add(newItem);
+                }
+
+                // Add the order to the context
+                context.Orders.Add(order);
+                context.SaveChanges();
+
+                // Add the order items to the context
+                context.OrderItems.AddRange(newOrderItems);
+            }
+
+            // Save changes for both orders and order items
+            context.SaveChanges();
+
+
 
             // Load Stocks from Transfers
             foreach (var transfer in transfers)
@@ -229,30 +271,13 @@
                         };
                         context.Stocks.Add(stock);
                     }
-                    
+
                 }
             }
             context.SaveChanges();
 
+
             // Load Stocks from Orders
-            foreach (var order in orders)
-            {
-                if (order.Stocks != null)
-                {
-                    foreach (var item in order.Stocks)
-                    {
-                        var stock = new OrderStock
-                        {
-                            ItemId = item.ItemId,
-                            Quantity = item.Quantity,
-                            OrderId = order.Id,
-                        };
-                        context.Stocks.Add(stock);
-                    }
-                    
-                }
-            }
-            context.SaveChanges();
         }
     }
 }
