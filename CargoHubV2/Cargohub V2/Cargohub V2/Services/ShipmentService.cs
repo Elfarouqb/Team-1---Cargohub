@@ -43,9 +43,37 @@ namespace Cargohub_V2.Services
             newShipment.CreatedAt = DateTime.UtcNow;
             newShipment.UpdatedAt = DateTime.UtcNow;
 
+            // Ensure that the OrderId is unique
+            var existingShipment = await _context.Shipments
+                .FirstOrDefaultAsync(s => s.OrderId == newShipment.OrderId); // Check for existing shipment with the same OrderId
+
+            if (existingShipment != null)
+            {
+                // If a shipment with the same OrderId already exists, return or throw an error
+                throw new InvalidOperationException("A shipment with the same OrderId already exists.");
+            }
+
             // Add the shipment to the database
             _context.Shipments.Add(newShipment);
             await _context.SaveChangesAsync(); // Ensure `Id` is generated here
+
+            // Split the OrderId string into individual order IDs
+            var orderIds = newShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
+
+            // Update the ShipmentId in the Orders table for each OrderId
+            foreach (var orderId in orderIds)
+            {
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.Id.ToString() == orderId);  // Ensure OrderId is string-based
+
+                if (order != null)
+                {
+                    order.ShipmentId = newShipment.Id;  // Update ShipmentId in the Orders table
+                }
+            }
+
+            // Save changes to the Orders table
+            await _context.SaveChangesAsync();
 
             // Assign the shipment's auto-generated Id to its items
             if (newShipment.Items != null)
@@ -64,7 +92,6 @@ namespace Cargohub_V2.Services
 
 
 
-
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
             var existingShipment = await _context.Shipments
@@ -77,6 +104,7 @@ namespace Cargohub_V2.Services
             }
 
             // Update the existing shipment properties
+            existingShipment.OrderId = updatedShipment.OrderId;
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;

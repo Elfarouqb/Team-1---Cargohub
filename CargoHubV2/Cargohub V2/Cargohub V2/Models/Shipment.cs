@@ -17,7 +17,7 @@ namespace Cargohub_V2.Models
 
 
         [JsonProperty("order_id")]
-        public int OrderId { get; set; }
+        public string OrderId { get; set; }
 
         [JsonProperty("source_id")]
         public int SourceId { get; set; }

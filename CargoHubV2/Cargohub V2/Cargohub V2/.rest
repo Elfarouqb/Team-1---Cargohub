@@ -22,8 +22,8 @@ POST  http://localhost:5285/api/shipments
 Content-Type: application/json
 
 {
-  "orderId": 8,
-  "sourceId": 456,
+  "orderId": "8,15,6",
+  "sourceId": 45,
   "orderDate": "2024-12-13T10:00:00Z",
   "requestDate": "2024-12-14T10:00:00Z",
   "shipmentDate": "2024-12-15T10:00:00Z",
@@ -57,6 +57,7 @@ PUT http://localhost:5285/api/shipments/5
 Content-Type: application/json
 
 {
+  "orderId": "8",
   "sourceId": 457,
   "orderDate": "2024-12-14T10:00:00Z",
   "requestDate": "2024-12-15T10:00:00Z",
