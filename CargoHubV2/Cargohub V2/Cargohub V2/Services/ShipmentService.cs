@@ -31,17 +31,6 @@ namespace Cargohub_V2.Services
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
         }
 
-        public async Task<List<Shipment>> GetShipmentsByOrderIdAsync(int orderId)
-        {
-            // Convert orderId to a JSON string without using optional arguments
-            string orderIdJson = JsonSerializer.Serialize(orderId, new JsonSerializerOptions());
-
-            // Query shipments where the OrderIds JSONB array contains the specified orderId
-            return await _context.Shipments
-                .Where(s => EF.Functions.JsonContains(s.OrderId.ToString(), orderIdJson))
-                .Include(s => s.Items)
-                .ToListAsync();
-        }
 
 
         public async Task<Shipment> AddShipmentAsync(Shipment newShipment)

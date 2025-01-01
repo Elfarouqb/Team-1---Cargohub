@@ -15,8 +15,8 @@ namespace Cargohub_V2.Models
 
         // Apply the SingleOrArrayConverter to handle both single value and array cases
         [JsonPropertyName("order_id")]
-        [JsonConverter(typeof(SingleOrArrayConverter))] // This is the key change
-        [Column(TypeName = "jsonb")] // JSONB column in DB
+        [Column(TypeName = "jsonb")]
+        [JsonConverter(typeof(SingleOrArrayConverter))]
         public List<int> OrderId { get; set; } = new List<int>();
 
         [JsonPropertyName("source_id")]

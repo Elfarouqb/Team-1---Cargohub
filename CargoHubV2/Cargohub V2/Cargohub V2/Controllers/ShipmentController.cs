@@ -35,12 +35,6 @@ namespace Cargohub_V2.Controllers
             return Ok(shipment);
         }
 
-        [HttpGet("by-order-id/{orderId}")]
-        public async Task<ActionResult<List<Shipment>>> GetShipmentsByOrderId(int orderId)
-        {
-            var shipments = await _shipmentService.GetShipmentsByOrderIdAsync(orderId);
-            return Ok(shipments);
-        }
 
         [HttpPost]
         public async Task<IActionResult> CreateShipment([FromBody] Shipment shipment)
