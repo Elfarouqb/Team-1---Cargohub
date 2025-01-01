@@ -48,7 +48,7 @@ namespace Cargohub_V2.Models
         public string? BillTo { get; set; }
 
         [JsonProperty("shipment_id")]
-        public int ShipmentId { get; set; }
+        public int? ShipmentId { get; set; }
 
         [JsonProperty("total_amount")]
         public double TotalAmount { get; set; }
