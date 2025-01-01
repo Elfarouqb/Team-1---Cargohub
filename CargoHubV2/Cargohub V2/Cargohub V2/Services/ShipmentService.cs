@@ -126,9 +126,27 @@ namespace Cargohub_V2.Services
 
             existingShipment.UpdatedAt = DateTime.UtcNow;
 
+            // Update the corresponding Order in the Orders table
+            var orderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
+
+            // Update the ShipmentId in the Orders table for each OrderId
+            foreach (var orderId in orderIds)
+            {
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.Id.ToString() == orderId);  // Ensure OrderId is string-based
+
+                if (order != null)
+                {
+                    order.ShipmentId = updatedShipment.Id;  // Update ShipmentId in the Orders table
+                }
+            }
+
+            // Save changes to the Orders table
+
             await _context.SaveChangesAsync();
             return true;
         }
+
 
 
         public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentItem> updatedItems)
