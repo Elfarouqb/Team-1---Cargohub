@@ -43,16 +43,6 @@ namespace Cargohub_V2.Services
             newShipment.CreatedAt = DateTime.UtcNow;
             newShipment.UpdatedAt = DateTime.UtcNow;
 
-            // Ensure that the OrderId is unique
-            var existingShipment = await _context.Shipments
-                .FirstOrDefaultAsync(s => s.OrderId == newShipment.OrderId); // Check for existing shipment with the same OrderId
-
-            if (existingShipment != null)
-            {
-                // If a shipment with the same OrderId already exists, return or throw an error
-                throw new InvalidOperationException("A shipment with the same OrderId already exists.");
-            }
-
             // Add the shipment to the database
             _context.Shipments.Add(newShipment);
             await _context.SaveChangesAsync(); // Ensure `Id` is generated here
@@ -91,20 +81,22 @@ namespace Cargohub_V2.Services
         }
 
 
-
-
-        public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
+        [HttpPut("{shipmentId}")]
+        public async Task<IActionResult> UpdateShipment(int shipmentId, [FromBody] Shipment updatedShipment)
         {
-            var existingShipment = await _context.Shipments
-                .Include(s => s.Items)  // Make sure to include the Items collection
-                .FirstOrDefaultAsync(s => s.Id == shipmentId);
+            if (updatedShipment == null)
+            {
+                return BadRequest("Invalid shipment data.");
+            }
+
+            var existingShipment = await _context.Shipments.FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
             {
-                return false;
+                return NotFound($"Shipment with ID {shipmentId} not found.");
             }
 
-            // Update the existing shipment properties
+            // Update shipment properties
             existingShipment.OrderId = updatedShipment.OrderId;
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
@@ -120,32 +112,37 @@ namespace Cargohub_V2.Services
             existingShipment.TransferMode = updatedShipment.TransferMode;
             existingShipment.TotalPackageCount = updatedShipment.TotalPackageCount;
             existingShipment.TotalPackageWeight = updatedShipment.TotalPackageWeight;
-
-            // Convert ICollection<ShipmentItem> to List<ShipmentItem> and assign
-            existingShipment.Items = updatedShipment.Items.ToList(); // This fixes the error
-
             existingShipment.UpdatedAt = DateTime.UtcNow;
 
-            // Update the corresponding Order in the Orders table
-            var orderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
-
-            // Update the ShipmentId in the Orders table for each OrderId
-            foreach (var orderId in orderIds)
+            // Validate that the shipment exists
+            if (!string.IsNullOrWhiteSpace(updatedShipment.OrderId))
             {
-                var order = await _context.Orders
-                    .FirstOrDefaultAsync(o => o.Id.ToString() == orderId);  // Ensure OrderId is string-based
-
-                if (order != null)
+                var shipmentExists = await _context.Shipments.AnyAsync(s => s.Id == updatedShipment.Id);
+                if (!shipmentExists)
                 {
-                    order.ShipmentId = updatedShipment.Id;  // Update ShipmentId in the Orders table
+                    return BadRequest($"Shipment with ID {updatedShipment.Id} does not exist.");
+                }
+
+                var orderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
+                foreach (var orderId in orderIds)
+                {
+                    var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id.ToString() == orderId);
+                    if (order != null)
+                    {
+                        order.ShipmentId = updatedShipment.Id;
+                    }
+                    else
+                    {
+                        return BadRequest($"Order with ID {orderId} does not exist.");
+                    }
                 }
             }
 
-            // Save changes to the Orders table
-
             await _context.SaveChangesAsync();
-            return true;
+            return Ok("Shipment updated successfully.");
         }
+
+
 
 
 
