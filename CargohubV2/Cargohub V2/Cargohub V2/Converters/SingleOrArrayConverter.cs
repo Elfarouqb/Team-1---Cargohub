@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-public class SingleOrArrayConverter : JsonConverter<List<int>>
+namespace Cargohub_V2.DataConverters
 {
-    public override List<int> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public class SingleOrArrayConverter : JsonConverter<List<int>>
     {
-        if (reader.TokenType == JsonTokenType.StartArray)
+        public override List<int> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            // If it's an array, deserialize as List<int>
-            return JsonSerializer.Deserialize<List<int>>(ref reader, options);
+            if (reader.TokenType == JsonTokenType.StartArray)
+            {
+                // If it's an array, deserialize as List<int>
+                return JsonSerializer.Deserialize<List<int>>(ref reader, options);
+            }
+            else
+            {
+                // If it's a single value, create a List<int> from it
+                int value = reader.GetInt32();
+                return new List<int> { value };
+            }
         }
-        else
-        {
-            // If it's a single value, create a List<int> from it
-            int value = reader.GetInt32();
-            return new List<int> { value };
-        }
-    }
 
-    public override void Write(Utf8JsonWriter writer, List<int> value, JsonSerializerOptions options)
-    {
-        JsonSerializer.Serialize(writer, value, options);
+        public override void Write(Utf8JsonWriter writer, List<int> value, JsonSerializerOptions options)
+        {
+            JsonSerializer.Serialize(writer, value, options);
+        }
     }
 }
+
