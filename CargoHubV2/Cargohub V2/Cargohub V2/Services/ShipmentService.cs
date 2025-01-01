@@ -38,7 +38,7 @@ namespace Cargohub_V2.Services
 
             // Query shipments where the OrderIds JSONB array contains the specified orderId
             return await _context.Shipments
-                .Where(s => EF.Functions.JsonContains(s.OrderIds.ToString(), orderIdJson))
+                .Where(s => EF.Functions.JsonContains(s.OrderId.ToString(), orderIdJson))
                 .Include(s => s.Items)
                 .ToListAsync();
         }
