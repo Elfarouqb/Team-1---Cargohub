@@ -22,7 +22,7 @@ POST  http://localhost:5285/api/shipments
 Content-Type: application/json
 
 {
-  "orderId": "8,15,6",
+  "orderId": "10",
   "sourceId": 45,
   "orderDate": "2024-12-13T10:00:00Z",
   "requestDate": "2024-12-14T10:00:00Z",
@@ -53,7 +53,7 @@ Content-Type: application/json
 ###
 
 # PUT (update) an existing shipment by ID
-PUT http://localhost:5285/api/shipments/5
+PUT http://localhost:5285/api/shipments/10
 Content-Type: application/json
 
 {

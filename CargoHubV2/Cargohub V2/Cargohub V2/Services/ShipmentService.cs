@@ -83,16 +83,16 @@ namespace Cargohub_V2.Services
 
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
-            var existingShipment = await _context.Shipments
-                .Include(s => s.Items)  // Make sure to include the Items collection
-                .FirstOrDefaultAsync(s => s.Id == shipmentId);
+            // Fetch the existing shipment
+            var existingShipment = await _context.Shipments.Include(s => s.Items).FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
             {
-                return false;
+                throw new Exception($"Shipment with ID {shipmentId} does not exist.");
             }
 
-            // Update the existing shipment properties
+            // Update shipment properties
+            existingShipment.OrderId = updatedShipment.OrderId;
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;
@@ -107,15 +107,51 @@ namespace Cargohub_V2.Services
             existingShipment.TransferMode = updatedShipment.TransferMode;
             existingShipment.TotalPackageCount = updatedShipment.TotalPackageCount;
             existingShipment.TotalPackageWeight = updatedShipment.TotalPackageWeight;
-
-            // Convert ICollection<ShipmentItem> to List<ShipmentItem> and assign
-            existingShipment.Items = updatedShipment.Items.ToList(); // This fixes the error
-
             existingShipment.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
-            return true;
+            // Update related orders
+            if (!string.IsNullOrWhiteSpace(updatedShipment.OrderId))
+            {
+                // Remove old order relationships if OrderId has changed
+                var existingOrderIds = existingShipment.OrderId?.Split(',').Select(id => id.Trim()).ToList() ?? new List<string>();
+                var updatedOrderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
+
+                // Handle removed orders
+                var removedOrderIds = existingOrderIds.Except(updatedOrderIds).ToList();
+                foreach (var removedOrderId in removedOrderIds)
+                {
+                    var removedOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id.ToString() == removedOrderId);
+                    if (removedOrder != null)
+                    {
+                        removedOrder.ShipmentId = null; // Clear ShipmentId
+                    }
+                }
+
+                // Handle added/updated orders
+                foreach (var orderId in updatedOrderIds)
+                {
+                    var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id.ToString() == orderId);
+                    if (order == null)
+                    {
+                        throw new Exception($"Order with ID {orderId} does not exist.");
+                    }
+
+                    order.ShipmentId = shipmentId; // Update ShipmentId
+                }
+            }
+
+            // Save changes to the database
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Error saving shipment changes: {ex.InnerException?.Message ?? ex.Message}");
+            }
         }
+
 
 
 
