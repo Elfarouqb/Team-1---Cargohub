@@ -66,19 +66,29 @@ namespace Cargohub_V2.Controllers
         }
 
 
-
-
-
         [HttpPut("{shipmentId}")]
         public async Task<IActionResult> UpdateShipment(int shipmentId, [FromBody] Shipment updatedShipment)
         {
-            var success = await _shipmentService.UpdateShipmentAsync(shipmentId, updatedShipment);
-            if (!success)
+            if (updatedShipment == null)
             {
-                return NotFound();
+                return BadRequest("Invalid shipment data.");
             }
 
-            return NoContent();
+            try
+            {
+                var result = await _shipmentService.UpdateShipmentAsync(shipmentId, updatedShipment);
+
+                if (!result)
+                {
+                    return NotFound($"Shipment with ID {shipmentId} not found.");
+                }
+
+                return Ok("Shipment updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("{shipmentId}/items")]

@@ -81,23 +81,18 @@ namespace Cargohub_V2.Services
         }
 
 
-        [HttpPut("{shipmentId}")]
-        public async Task<IActionResult> UpdateShipment(int shipmentId, [FromBody] Shipment updatedShipment)
+        public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
-            if (updatedShipment == null)
-            {
-                return BadRequest("Invalid shipment data.");
-            }
-
-            var existingShipment = await _context.Shipments.FirstOrDefaultAsync(s => s.Id == shipmentId);
+            var existingShipment = await _context.Shipments
+                .Include(s => s.Items)  // Make sure to include the Items collection
+                .FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
             {
-                return NotFound($"Shipment with ID {shipmentId} not found.");
+                return false;
             }
 
-            // Update shipment properties
-            existingShipment.OrderId = updatedShipment.OrderId;
+            // Update the existing shipment properties
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
             existingShipment.RequestDate = updatedShipment.RequestDate;
@@ -112,37 +107,15 @@ namespace Cargohub_V2.Services
             existingShipment.TransferMode = updatedShipment.TransferMode;
             existingShipment.TotalPackageCount = updatedShipment.TotalPackageCount;
             existingShipment.TotalPackageWeight = updatedShipment.TotalPackageWeight;
+
+            // Convert ICollection<ShipmentItem> to List<ShipmentItem> and assign
+            existingShipment.Items = updatedShipment.Items.ToList(); // This fixes the error
+
             existingShipment.UpdatedAt = DateTime.UtcNow;
 
-            // Validate that the shipment exists
-            if (!string.IsNullOrWhiteSpace(updatedShipment.OrderId))
-            {
-                var shipmentExists = await _context.Shipments.AnyAsync(s => s.Id == updatedShipment.Id);
-                if (!shipmentExists)
-                {
-                    return BadRequest($"Shipment with ID {updatedShipment.Id} does not exist.");
-                }
-
-                var orderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
-                foreach (var orderId in orderIds)
-                {
-                    var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id.ToString() == orderId);
-                    if (order != null)
-                    {
-                        order.ShipmentId = updatedShipment.Id;
-                    }
-                    else
-                    {
-                        return BadRequest($"Order with ID {orderId} does not exist.");
-                    }
-                }
-            }
-
             await _context.SaveChangesAsync();
-            return Ok("Shipment updated successfully.");
+            return true;
         }
-
-
 
 
 
