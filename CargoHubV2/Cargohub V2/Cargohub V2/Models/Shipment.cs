@@ -70,7 +70,7 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public ICollection<ShipmentItem> Items { get; set; }
+        public ICollection<ShipmentItem>? Items { get; set; }
 
     }
 
