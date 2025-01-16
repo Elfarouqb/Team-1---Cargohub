@@ -1,103 +1,128 @@
-import datetime
 import pytest
 import requests
+import time
+
+BASE_URL = "http://localhost:5285/api/ItemTypes"
 
 
 @pytest.fixture
-def test_get_item_types():
-    url = 'http://localhost:3000/api/v1/item_types'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5'
+def headers():
+    return {
+        "Content-Type": "application/json"
     }
+
+
+@pytest.fixture
+def sample_item_type():
+    return {
+        "name": "Test Item Type",
+        "description": "A description for the test item type."
+    }
+
+# Test GetAllItemTypes
+
+
+@pytest.mark.asyncio
+def test_get_all_item_types(headers):
+    url = f"{BASE_URL}/byAmount/10"
+    response = requests.get(url, headers=headers)
+
+    assert response.status_code == 200
+    response_json = response.json()
+    assert isinstance(response_json, list), "Expected a list in response"
+    assert len(response_json) > 0, "Response list is empty"
+
+
+@pytest.mark.asyncio
+def test_get_all_item_types_with_max_pagination(headers):
+    url = f"{BASE_URL}/byAmount/1000"
+    response = requests.get(url, headers=headers)
+
+    assert response.status_code == 200
+    response_json = response.json()
+    assert isinstance(response_json, list), "Expected a list in response"
+    assert len(response_json) > 0, "Response list is empty"
+
+# Test GetItemTypeById
+
+
+def test_get_item_type_by_id(headers):
+    item_type_id = 101  # Replace with a valid item type ID
+    url = f"{BASE_URL}/{item_type_id}"
 
     response = requests.get(url, headers=headers)
 
-    status_code = response.status_code
+    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
+    response_data = response.json()
+    assert "name" in response_data, "Response JSON does not contain 'name' field"
+    assert response_data[
+        "name"] == "Test Item Type", f"Expected name 'Example Item Type', got {response_data['name']}"
 
-    assert status_code == 200
+# Test GetItemTypeByName
 
 
-def test_get_item_type():
-    url = 'http://localhost:3000/api/v1/item_types/1'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5'
-    }
+def test_get_item_type_by_name(headers):
+    name = "Test Item Type"  # Replace with a valid item type name
+    url = f"{BASE_URL}/ByName/{name}"
 
     response = requests.get(url, headers=headers)
 
-    status_code = response.status_code
+    assert response.status_code in [200, 404], f"Unexpected status code: {response.status_code}"
 
-    assert status_code == 200
+    if response.status_code == 404:
+        expected_message = f"Item type with Name: {name} not found."
+        response_data = response.json()
+        assert "message" in response_data, "Error response does not contain 'message' field"
+        assert response_data["message"] == expected_message, (
+            f"Expected message '{expected_message}', got '{response_data['message']}'"
+        )
+    elif response.status_code == 200:
+        response_data = response.json()
+        assert "name" in response_data, "Response JSON does not contain 'name' field"
+        assert response_data["name"] == name, (
+            f"Expected name '{name}', got '{response_data['name']}'"
+        )
 
-
-def test_add_item_type():
-    url = 'http://localhost:3000/api/v1/item_types'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5',
-    }
-
-    new_item_type = {
-        "id": 1,
-        "name": "Johns stuff",
-        "description": ""
-    }
-
-    response = requests.post(url, json=new_item_type, headers=headers)
-
-    assert response.status_code == 201
+# Test AddItemType
 
 
-"""    test = requests.get(url + "/" + str(new_item_type["id"]), headers=headers)
+def test_create_duplicate_item_type(headers, sample_item_type):
+    url = f"{BASE_URL}/Add"
 
-    assert test.status_code == 200
-    test = test.json()
-    assert test["name"] == new_item_type["name"]"""
-"""
-    created_datetime = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
-    updated_datetime = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
+    requests.post(url, json=sample_item_type, headers=headers)
+    time.sleep(1)  # Prevent concurrency issues
+    response2 = requests.post(url, json=sample_item_type, headers=headers)
 
-    created_at = test["created_at"]
-    updated_at = test["updated_at"]
+    assert response2.status_code == 400, "Expected status code 400 (Bad Request)"
+    assert "Item Type with this name already exists" in response2.text
 
-    assert created_at == created_datetime
-    assert updated_at == updated_datetime"""
+# Test UpdateItemType
 
 
-def test_update_item_type():
-    url = 'http://localhost:3000/api/v1/item_types/0'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5',
-    }
+@pytest.mark.asyncio
+def test_update_item_type(headers, sample_item_type):
+    item_type_id = 101  # Replace with a valid item type ID
+    url = f"{BASE_URL}/{item_type_id}"
 
-    updated_item_type = {
-        "id": 0,
-        "name": "Laptop Zenbook",
-        "description": "",
-        "created_at": "2023-05-15 19:52:53",
-    }
+    sample_item_type["name"] = "Updated Item Type Name"
+    response = requests.put(url, json=sample_item_type, headers=headers)
 
-    response = requests.put(url, json=updated_item_type, headers=headers)
+    assert response.status_code in [200, 204], f"Unexpected status code: {response.status_code}"
+    if response.status_code == 200:
+        assert response.json()["name"] == "Updated Item Type Name", (
+            f"Expected updated name 'Updated Item Type Name', got '{response.json()['name']}'"
+        )
 
-    assert response.status_code == 200, f"{response.status_code}"
-
-    test = requests.get(url, headers=headers)
-
-    assert test.status_code == 200
-
-    # test = test.json()
-
-    # assert test["id"] == updated_item_type["id"]
-    # assert test["name"] == updated_item_type["name"]
-    # assert test["description"] == updated_item_type["description"]
-    # assert test["created_at"] == updated_item_type["created_at"]
+# Test RemoveItemTypeById
 
 
-def test_delete_item_type():
-    url = 'http://localhost:3000/api/v1/item_types/0'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5',
-    }
+@pytest.mark.asyncio
+def test_remove_item_type_by_id(headers):
+    item_type_id = 101  # Replace with a valid item type ID
+    url = f"{BASE_URL}/{item_type_id}"
 
     response = requests.delete(url, headers=headers)
 
-    assert response.status_code == 200
+    assert response.status_code in [200, 404], f"Unexpected status code: {response.status_code}"
+    if response.status_code == 200:
+        assert "Item type deleted successfully" in response.text

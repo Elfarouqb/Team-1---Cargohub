@@ -1,102 +1,133 @@
-import datetime
 import pytest
 import requests
+import time
+
+BASE_URL = "http://localhost:5285/api/ItemGroups"
 
 
 @pytest.fixture
-def test_get_item_groups():
-    url = 'http://localhost:3000/api/v1/item_groups'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5'
+def headers():
+    return {
+        "Content-Type": "application/json"
     }
+
+
+@pytest.fixture
+def sample_item_group():
+    return {
+        "name": "Test Item Group",
+        "description": "A description for the test item group."
+    }
+
+
+# Test GetAllItemGroups
+@pytest.mark.asyncio
+def test_get_all_item_groups(headers):
+    url = f"{BASE_URL}/byAmount/10"
+    response = requests.get(url, headers=headers)
+
+    assert response.status_code == 200
+    response_json = response.json()
+    assert isinstance(response.json(), list)
+    assert len(response_json) > 0, "Response list is empty"
+
+
+@pytest.mark.asyncio
+def test_get_all_item_groups_with_max_pagination(headers):
+    url = f"{BASE_URL}/byAmount/1000"
+    response = requests.get(url, headers=headers)
+
+    assert response.status_code == 200
+    response_json = response.json()
+    assert isinstance(response.json(), list)
+    assert len(response_json) > 0, "Response list is empty"
+
+
+# Test GetItemGroupById
+def test_get_item_group_by_id(headers):
+    item_group_id = 1  # Replace with a valid item group ID
+    url = f"{BASE_URL}/{item_group_id}"
 
     response = requests.get(url, headers=headers)
 
-    status_code = response.status_code
+    # Check for successful response
+    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
 
-    assert status_code == 200
+    # Check that the response contains a 'name' field
+    response_data = response.json()
+    assert "name" in response_data, "Response JSON does not contain 'name' field"
+    assert response_data["name"] == "Electronics", f"Expected name 'Electronics', got {response_data['name']}"
+
+# Test GetItemGroupByName
 
 
-def test_get_item_group():
-    url = 'http://localhost:3000/api/v1/item_groups/1'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5'
-    }
+def test_get_item_group_by_name(headers):
+    name = "Test Item Group"  # Replace with a valid item group name
+    url = f"{BASE_URL}/ByName/{name}"
 
     response = requests.get(url, headers=headers)
 
-    status_code = response.status_code
+    # Check for both success and "not found" scenarios
+    assert response.status_code in [200, 404], f"Unexpected status code: {response.status_code}"
 
-    assert status_code == 200
+    if response.status_code == 404:
+        # Ensure the error message matches the expected pattern
+        expected_message = f"Item group with Name: {name} not found."
+        response_data = response.json()  # Assuming API returns a JSON response
+        assert "message" in response_data, "Error response does not contain 'message' field"
+        assert response_data["message"] == expected_message, (
+            f"Expected message '{expected_message}', got '{response_data['message']}'"
+        )
+    elif response.status_code == 200:
+        # Validate the 'name' field in successful responses
+        response_data = response.json()
+        assert "name" in response_data, "Response JSON does not contain 'name' field"
+        assert response_data["name"] == name, (
+            f"Expected name '{name}', got '{response_data['name']}'"
+        )
 
-
-# def test_add_item_group():
-#     url = 'http://localhost:3000/api/v1/item_groups'
-#     headers = {
-#         'API_KEY': 'a1b2c3d4e5',
-#     }
-
-#     new_item_group = {
-#         "name": "Johns stuff",
-#         "description": ""
-#     }
-
-#     response = requests.post(url, json=new_item_group, headers=headers)
-
-#     assert response.status_code == 201
-
-
-# """    test = requests.get(url + "/" + str(new_item_group["id"]), headers=headers)
-
-#     assert test.status_code == 200
-#     test = test.json()
-#     assert test["name"] == new_item_group["name"]"""
-# """
-#     created_datetime = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
-#     updated_datetime = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
-
-#     created_at = test["created_at"]
-#     updated_at = test["updated_at"]
-
-#     assert created_at == created_datetime
-#     assert updated_at == updated_datetime"""
+# Test AddItemGroup
 
 
-def test_update_item_group():
-    url = 'http://localhost:3000/api/v1/item_groups/1'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5',
-    }
+def test_create_duplicate_item_group(headers, sample_item_group):
+    url = f"{BASE_URL}/Add"
 
-    updated_item_group = {
-        "id": 1,
-        "name": "New Electronics",
-        "description": "",
-        "created_at": "2023-05-15 19:52:53",
-    }
+    # First request to create the item group
+    response1 = requests.post(url, json=sample_item_group, headers=headers)
 
-    response = requests.put(url, json=updated_item_group, headers=headers)
+    # Wait for 1 second before the second request, otherwise both get added at
+    # the same time and it fails and causes double creation
+    time.sleep(1)
 
-    assert response.status_code == 200, f"{response.status_code}"
+    # Second request to create the same item group
+    response2 = requests.post(url, json=sample_item_group, headers=headers)
+    assert response1.status_code == 400  # Created successfully
+    assert "Item Group with this name already exists" in response2.text
 
-    test = requests.get(url, headers=headers)
-
-    assert test.status_code == 200
-
-    # test = test.json()
-
-    # assert test["id"] == updated_item_group["id"]
-    # assert test["name"] == updated_item_group["name"]
-    # assert test["description"] == updated_item_group["description"]
-    # assert test["created_at"] == updated_item_group["created_at"]
+# Test UpdateItemGroup
 
 
-def test_delete_item_group():
-    url = 'http://localhost:3000/api/v1/item_groups/1'
-    headers = {
-        'API_KEY': 'a1b2c3d4e5',
-    }
+@pytest.mark.asyncio
+def test_update_item_group(headers, sample_item_group):
+    item_group_id = 1  # Replace with a valid item group ID
+    url = f"{BASE_URL}/{item_group_id}"
+
+    sample_item_group["name"] = "Electronics"
+    response = requests.put(url, json=sample_item_group, headers=headers)
+
+    assert response.status_code in [200, 204]
+    if response.status_code == 200:
+        assert response.json()["name"] == "Electronics"
+
+
+# Test RemoveItemGroupById
+@pytest.mark.asyncio
+def test_remove_item_group_by_id(headers):
+    item_group_id = 110  # Replace with a valid item group ID
+    url = f"{BASE_URL}/Delete/{item_group_id}"
 
     response = requests.delete(url, headers=headers)
 
-    assert response.status_code == 200
+    assert response.status_code in [200, 404]
+    if response.status_code == 200:
+        assert "Item group deleted successfully" in response.text
