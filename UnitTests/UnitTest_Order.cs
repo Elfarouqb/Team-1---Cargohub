@@ -1,4 +1,4 @@
-namespace CargoHubTest;
+namespace UnitTests;
 
 [TestClass]
 public class Order_Test

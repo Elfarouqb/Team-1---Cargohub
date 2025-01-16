@@ -1,4 +1,4 @@
-namespace CargoHubTest;
+namespace UnitTests;
 
 [TestClass]
 public class Item_Type_Test
