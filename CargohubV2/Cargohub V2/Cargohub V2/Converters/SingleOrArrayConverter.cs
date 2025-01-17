@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 public class SingleOrArrayConverter : JsonConverter<List<int>>
 {
     public override List<int> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -46,6 +51,7 @@ public class SingleOrArrayConverter : JsonConverter<List<int>>
         JsonSerializer.Serialize(writer, value, options);
     }
 }
+
 
 
 

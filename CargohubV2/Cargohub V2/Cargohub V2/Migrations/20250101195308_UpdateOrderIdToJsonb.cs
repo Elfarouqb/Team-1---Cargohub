@@ -11,25 +11,20 @@ namespace CargohubV2.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<List<int>>(
-                name: "OrderId",
-                table: "Shipments",
-                type: "jsonb",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "integer");
+            // Add the explicit cast to jsonb using the USING clause
+            migrationBuilder.Sql(
+                "ALTER TABLE \"Shipments\" ALTER COLUMN \"OrderId\" TYPE jsonb USING \"OrderId\"::jsonb;"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "OrderId",
-                table: "Shipments",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(List<int>),
-                oldType: "jsonb");
+            // If you want to rollback, you may want to convert jsonb back to its original type, e.g., integer
+            migrationBuilder.Sql(
+                "ALTER TABLE \"Shipments\" ALTER COLUMN \"OrderId\" TYPE integer USING \"OrderId\"::integer;"
+            );
         }
     }
 }
+
