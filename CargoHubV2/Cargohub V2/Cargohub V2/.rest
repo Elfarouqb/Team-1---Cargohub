@@ -12,7 +12,7 @@ Accept: application/json
 ###
 
 # GET items in a shipment by shipment ID
-GET http://localhost:5285/api/shipments/10114/items
+GET http://localhost:5285/api/shipments/10/items
 Accept: application/json
 
 ###
@@ -22,8 +22,8 @@ POST  http://localhost:5285/api/shipments
 Content-Type: application/json
 
 {
-  "orderId": "1",
-  "sourceId": 45,
+  "orderId": "8",
+  "sourceId": 456,
   "orderDate": "2024-12-13T10:00:00Z",
   "requestDate": "2024-12-14T10:00:00Z",
   "shipmentDate": "2024-12-15T10:00:00Z",
@@ -36,19 +36,29 @@ Content-Type: application/json
   "paymentType": "Prepaid",
   "transferMode": "Air",
   "totalPackageCount": 5,
-  "totalPackageWeight": 50.5
+  "totalPackageWeight": 50.5,
+  "items": [
+    {
+      "itemId": "P007435",
+      "amount": 23
+    },
+    {
+      "itemId": "P009557",
+      "amount": 1
+    }
+  ]
 }
 
 
 ###
 
 # PUT (update) an existing shipment by ID
-PUT http://localhost:5285/api/shipments/10114
+PUT http://localhost:5285/api/shipments/5
 Content-Type: application/json
 
 {
-  "orderId": "1,2",
   "sourceId": 457,
+  "orderId" : "10",
   "orderDate": "2024-12-14T10:00:00Z",
   "requestDate": "2024-12-15T10:00:00Z",
   "shipmentDate": "2024-12-16T10:00:00Z",
@@ -68,7 +78,7 @@ Content-Type: application/json
 ###
 
 # PUT (update) items in a shipment by shipment ID
-PUT http://localhost:5285/api/shipments/5/items
+PUT http://localhost:5285/api/shipments/7/items
 Content-Type: application/json
 
 [
@@ -83,7 +93,7 @@ Content-Type: application/json
     "weight": 10.0
   }
 ]
-//does not update the items in an order
+
 
 ###
 

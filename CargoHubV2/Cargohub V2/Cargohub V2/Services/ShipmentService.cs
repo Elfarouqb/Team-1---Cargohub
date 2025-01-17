@@ -150,23 +150,29 @@ namespace Cargohub_V2.Services
 
         public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentItem> updatedItems)
         {
-            var shipment = await GetShipmentByIdAsync(shipmentId);
+            var shipment = await _context.Shipments
+                .Include(s => s.Items) // Include existing items for modification
+                .FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (shipment == null)
             {
                 return false;
             }
 
-            //Clear existing items and add the new ones
-            shipment.Items.Clear();
+            // Remove existing items explicitly
+            _context.ShipmentItems.RemoveRange(shipment.Items);
 
+            // Add new items
             foreach (var item in updatedItems)
             {
-                shipment.Items.Add(item);
+                item.ShipmentId = shipmentId; // Ensure proper association
+                _context.ShipmentItems.Add(item);
             }
 
+            // Update the shipment's timestamp
             shipment.UpdatedAt = DateTime.UtcNow;
 
+            // Save changes
             await _context.SaveChangesAsync();
             return true;
         }
