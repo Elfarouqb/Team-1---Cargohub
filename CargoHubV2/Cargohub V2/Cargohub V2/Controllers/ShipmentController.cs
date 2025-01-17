@@ -63,6 +63,8 @@ namespace Cargohub_V2.Controllers
 
             // Return a CreatedAtAction response with a route to GetShipmentById
             return CreatedAtAction(nameof(GetShipmentById), new { id = createdShipment.Id }, createdShipment);
+            return CreatedAtAction(nameof(GetShipmentById), new { shipmentId = createdShipment.Id }, createdShipment);
+
         }
 
 

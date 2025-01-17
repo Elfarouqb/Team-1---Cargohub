@@ -19,71 +19,67 @@ namespace Cargohub_V2.Services
         public async Task<List<Shipment>> GetAllShipmentsAsync()
         {
             return await _context.Shipments
-                .Include(s => s.Items) // Load the related ShipmentItems
+                .Include(s => s.Items) //Load ShipmentItems
                 .ToListAsync();
         }
 
         public async Task<Shipment?> GetShipmentByIdAsync(int shipmentId)
         {
             return await _context.Shipments
-                .Include(s => s.Items) // Load the related ShipmentItems
+                .Include(s => s.Items) //Load ShipmentItems
                 .FirstOrDefaultAsync(s => s.Id == shipmentId);
         }
 
         public async Task<List<ShipmentItem>> GetItemsInShipmentAsync(int shipmentId)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
-            return shipment?.Items.ToList() ?? new List<ShipmentItem>(); // Convert ICollection to List explicitly
+            return shipment?.Items.ToList() ?? new List<ShipmentItem>(); //convert to list
         }
 
 
         public async Task<Shipment> AddShipmentAsync(Shipment newShipment)
         {
-            // Add timestamps
             newShipment.CreatedAt = DateTime.UtcNow;
             newShipment.UpdatedAt = DateTime.UtcNow;
 
-            // Add the shipment to the database
+            //Add the shipment to the database
             _context.Shipments.Add(newShipment);
-            await _context.SaveChangesAsync(); // Ensure `Id` is generated here
-
-            // Split the OrderId string into individual order IDs
-            var orderIds = newShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
-
-            // Update the ShipmentId in the Orders table for each OrderId
-            foreach (var orderId in orderIds)
-            {
-                var order = await _context.Orders
-                    .FirstOrDefaultAsync(o => o.Id.ToString() == orderId);  // Ensure OrderId is string-based
-
-                if (order != null)
-                {
-                    order.ShipmentId = newShipment.Id;  // Update ShipmentId in the Orders table
-                }
-            }
-
-            // Save changes to the Orders table
             await _context.SaveChangesAsync();
 
-            // Assign the shipment's auto-generated Id to its items
-            if (newShipment.Items != null)
-            {
-                foreach (var item in newShipment.Items)
-                {
-                    item.ShipmentId = newShipment.Id;
-                }
+            //Split OrderId string
+            var orderIds = newShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
 
-                // Save again if items were updated
-                await _context.SaveChangesAsync();
+            //Update the ShipmentId in the Orders and create ShipmentItems van de Orders
+            var shipmentItems = new List<ShipmentItem>();
+            foreach (var orderId in orderIds)
+            {
+                //Orders matching the OrderId
+                var orderItems = await _context.OrderItems.Where(oi => oi.OrderId.ToString() == orderId).ToListAsync();
+
+                foreach (var orderItem in orderItems)
+                {
+                    //Create ShipmentItem for each OrderItem
+                    shipmentItems.Add(new ShipmentItem
+                    {
+                        ShipmentId = newShipment.Id,
+                        ItemId = orderItem.ItemId,
+                        Amount = orderItem.Amount
+                    });
+                }
             }
+
+            //Add ShipmentItems to database
+            _context.ShipmentItems.AddRange(shipmentItems);
+            await _context.SaveChangesAsync();
 
             return newShipment;
         }
 
 
+
         public async Task<bool> UpdateShipmentAsync(int shipmentId, Shipment updatedShipment)
         {
-            // Fetch the existing shipment
+            //Get shipment
             var existingShipment = await _context.Shipments.Include(s => s.Items).FirstOrDefaultAsync(s => s.Id == shipmentId);
 
             if (existingShipment == null)
@@ -91,7 +87,7 @@ namespace Cargohub_V2.Services
                 throw new Exception($"Shipment with ID {shipmentId} does not exist.");
             }
 
-            // Update shipment properties
+            //Update shipment properties
             existingShipment.OrderId = updatedShipment.OrderId;
             existingShipment.SourceId = updatedShipment.SourceId;
             existingShipment.OrderDate = updatedShipment.OrderDate;
@@ -109,38 +105,36 @@ namespace Cargohub_V2.Services
             existingShipment.TotalPackageWeight = updatedShipment.TotalPackageWeight;
             existingShipment.UpdatedAt = DateTime.UtcNow;
 
-            // Update related orders
-            if (!string.IsNullOrWhiteSpace(updatedShipment.OrderId))
+            //Update ShipmentItems for new OrderId
+            var orderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
+
+            //Remove old ShipmentItems
+            var existingItems = _context.ShipmentItems.Where(si => si.ShipmentId == shipmentId);
+            _context.ShipmentItems.RemoveRange(existingItems);
+
+            //Create new ShipmentItems
+            var shipmentItems = new List<ShipmentItem>();
+            foreach (var orderId in orderIds)
             {
-                // Remove old order relationships if OrderId has changed
-                var existingOrderIds = existingShipment.OrderId?.Split(',').Select(id => id.Trim()).ToList() ?? new List<string>();
-                var updatedOrderIds = updatedShipment.OrderId.Split(',').Select(id => id.Trim()).ToList();
+                //Get orders matching OrderId
+                var orderItems = await _context.OrderItems.Where(oi => oi.OrderId.ToString() == orderId).ToListAsync();
 
-                // Handle removed orders
-                var removedOrderIds = existingOrderIds.Except(updatedOrderIds).ToList();
-                foreach (var removedOrderId in removedOrderIds)
+                foreach (var orderItem in orderItems)
                 {
-                    var removedOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id.ToString() == removedOrderId);
-                    if (removedOrder != null)
+                    //Create ShipmentItem for each OrderItem
+                    shipmentItems.Add(new ShipmentItem
                     {
-                        removedOrder.ShipmentId = null; // Clear ShipmentId
-                    }
-                }
-
-                // Handle added/updated orders
-                foreach (var orderId in updatedOrderIds)
-                {
-                    var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id.ToString() == orderId);
-                    if (order == null)
-                    {
-                        throw new Exception($"Order with ID {orderId} does not exist.");
-                    }
-
-                    order.ShipmentId = shipmentId; // Update ShipmentId
+                        ShipmentId = shipmentId,
+                        ItemId = orderItem.ItemId,
+                        Amount = orderItem.Amount
+                    });
                 }
             }
 
-            // Save changes to the database
+            //Add new ShipmentItems
+            _context.ShipmentItems.AddRange(shipmentItems);
+
+            //Save changes
             try
             {
                 await _context.SaveChangesAsync();
@@ -154,7 +148,6 @@ namespace Cargohub_V2.Services
 
 
 
-
         public async Task<bool> UpdateItemsInShipmentAsync(int shipmentId, List<ShipmentItem> updatedItems)
         {
             var shipment = await GetShipmentByIdAsync(shipmentId);
@@ -164,7 +157,7 @@ namespace Cargohub_V2.Services
                 return false;
             }
 
-            // Clear existing items and add the new ones
+            //Clear existing items and add the new ones
             shipment.Items.Clear();
 
             foreach (var item in updatedItems)
