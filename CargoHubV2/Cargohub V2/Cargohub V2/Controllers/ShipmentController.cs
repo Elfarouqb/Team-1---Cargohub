@@ -105,7 +105,6 @@ namespace Cargohub_V2.Controllers
             return NoContent();
         }
 
-
         [HttpDelete("{shipmentId}")]
         public async Task<IActionResult> RemoveShipment(int shipmentId)
         {
@@ -117,5 +116,7 @@ namespace Cargohub_V2.Controllers
 
             return NoContent();
         }
+
+
     }
 }

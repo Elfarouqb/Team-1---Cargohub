@@ -73,6 +73,7 @@ namespace Cargohub_V2.Models
         [JsonProperty("items")]
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+
     }
 
     public class OrderItem

@@ -180,16 +180,25 @@ namespace Cargohub_V2.Services
 
         public async Task<bool> RemoveShipmentAsync(int shipmentId)
         {
-            var shipment = await _context.Shipments.FindAsync(shipmentId);
+            var shipment = await _context.Shipments
+                .Include(s => s.Orders) // Include related Orders
+                .FirstOrDefaultAsync(s => s.Id == shipmentId);
+
             if (shipment == null)
             {
                 return false;
             }
 
+            // Set ShipmentId to null for all related Orders
+            foreach (var order in shipment.Orders)
+            {
+                order.ShipmentId = null;
+            }
+
+            // Remove the shipment
             _context.Shipments.Remove(shipment);
             await _context.SaveChangesAsync();
             return true;
         }
-    }
 
-}
+    }
