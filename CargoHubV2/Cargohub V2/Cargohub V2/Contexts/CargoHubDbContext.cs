@@ -18,6 +18,13 @@ namespace Cargohub_V2.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Shipment>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .UseIdentityAlwaysColumn(); // Use default identity settings
+            });
+
             // Configure one-to-many relationship between Order and StockOfItems
             // Configure relationships between entities here
             modelBuilder.Entity<Order>()
