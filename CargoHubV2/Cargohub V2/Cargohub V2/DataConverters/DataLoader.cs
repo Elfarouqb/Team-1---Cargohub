@@ -175,42 +175,6 @@
             // Load Stocks from Shipments
             context.SaveChanges();
 
-            var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
-            foreach (var shipment in shipments)
-            {
-
-                shipment.CreatedAt = ToUtc(shipment.CreatedAt);
-                shipment.UpdatedAt = ToUtc(shipment.UpdatedAt);
-
-                // Create a temporary list to store the new items
-                var newItems = new List<ShipmentItem>();
-
-                foreach (var item in shipment.Items)
-                {
-                    var shipmentItem = new ShipmentItem
-                    {
-                        ItemId = item.ItemId,
-                        Amount = item.Amount,
-                        ShipmentId = shipment.Id // Ensure the shipment ID is set
-                    };
-
-                    // Add the created shipmentItem to the temporary list
-                    newItems.Add(shipmentItem);
-                }
-
-                // After the loop finishes, add the new items to the shipment
-                foreach (var newItem in newItems)
-                {
-                    shipment.Items.Add(newItem);
-                }
-
-                context.Shipments.Add(shipment); // Add shipment with items
-            }
-
-            context.SaveChanges();
-
-            // Import Orders
-            // Load Orders
             var orders = LoadDataFromFile<Order>("data/orders.json");
             foreach (var order in orders)
             {
@@ -253,6 +217,44 @@
 
             // Save changes for both orders and order items
             context.SaveChanges();
+
+            var shipments = LoadDataFromFile<Shipment>("data/shipments.json");
+            foreach (var shipment in shipments)
+            {
+
+                shipment.CreatedAt = ToUtc(shipment.CreatedAt);
+                shipment.UpdatedAt = ToUtc(shipment.UpdatedAt);
+
+                // Create a temporary list to store the new items
+                var newItems = new List<ShipmentItem>();
+
+                foreach (var item in shipment.Items)
+                {
+                    var shipmentItem = new ShipmentItem
+                    {
+                        ItemId = item.ItemId,
+                        Amount = item.Amount,
+                        ShipmentId = shipment.Id // Ensure the shipment ID is set
+                    };
+
+                    // Add the created shipmentItem to the temporary list
+                    newItems.Add(shipmentItem);
+                }
+
+                // After the loop finishes, add the new items to the shipment
+                foreach (var newItem in newItems)
+                {
+                    shipment.Items.Add(newItem);
+                }
+
+                context.Shipments.Add(shipment); // Add shipment with items
+            }
+
+            context.SaveChanges();
+
+            // Import Orders
+            // Load Orders
+
 
 
 

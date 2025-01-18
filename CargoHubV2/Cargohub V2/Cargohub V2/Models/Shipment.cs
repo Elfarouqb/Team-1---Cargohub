@@ -17,7 +17,7 @@ namespace Cargohub_V2.Models
 
 
         [JsonProperty("order_id")]
-        public int OrderId { get; set; }
+        public string OrderId { get; set; }
 
         [JsonProperty("source_id")]
         public int SourceId { get; set; }
@@ -70,7 +70,8 @@ namespace Cargohub_V2.Models
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("items")]
-        public ICollection<ShipmentItem> Items { get; set; }
+        public ICollection<ShipmentItem>? Items { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     }
 

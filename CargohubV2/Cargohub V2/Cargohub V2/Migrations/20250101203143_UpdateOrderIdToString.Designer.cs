@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cargohub_V2.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CargohubV2.Migrations
 {
     [DbContext(typeof(CargoHubDbContext))]
-    partial class CargoHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250101203143_UpdateOrderIdToString")]
+    partial class UpdateOrderIdToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -337,7 +340,7 @@ namespace CargohubV2.Migrations
                     b.Property<string>("ShipTo")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ShipmentId")
+                    b.Property<int>("ShipmentId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ShippingNotes")
@@ -365,8 +368,6 @@ namespace CargohubV2.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ShipmentId");
 
                     b.ToTable("Orders");
                 });
@@ -419,9 +420,8 @@ namespace CargohubV2.Migrations
                     b.Property<string>("OrderDate")
                         .HasColumnType("text");
 
-                    b.Property<string>("OrderId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PaymentType")
                         .HasColumnType("text");
@@ -702,16 +702,6 @@ namespace CargohubV2.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("Cargohub_V2.Models.Order", b =>
-                {
-                    b.HasOne("Cargohub_V2.Models.Shipment", "Shipment")
-                        .WithMany("Orders")
-                        .HasForeignKey("ShipmentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Shipment");
-                });
-
             modelBuilder.Entity("Cargohub_V2.Models.OrderItem", b =>
                 {
                     b.HasOne("Cargohub_V2.Models.Order", null)
@@ -802,8 +792,6 @@ namespace CargohubV2.Migrations
             modelBuilder.Entity("Cargohub_V2.Models.Shipment", b =>
                 {
                     b.Navigation("Items");
-
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Cargohub_V2.Models.Transfer", b =>

@@ -18,24 +18,20 @@ namespace Cargohub_V2.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure one-to-many relationship between Order and StockOfItems
-            // Configure relationships between entities here
             modelBuilder.Entity<Order>()
-                .HasMany(o => o.OrderItems)  // An Order has many OrderItems
-                .WithOne()                   // Each OrderItem has one Order
-                .HasForeignKey(oi => oi.OrderId) // Foreign key in OrderItem
-                .OnDelete(DeleteBehavior.Cascade); // Cascade delete for related OrderItems when Order is deleted
+                .HasOne(o => o.Shipment)
+                .WithMany(s => s.Orders)
+                .HasForeignKey(o => o.ShipmentId)
+                .OnDelete(DeleteBehavior.SetNull); // Set ShipmentId to null when Shipment is deleted
 
             modelBuilder.Entity<Warehouse>()
                 .OwnsOne(w => w.Contact);
             modelBuilder.Entity<Stock>()
-            .ToTable("Stocks")
-            .HasDiscriminator<string>("StockType")
-            .HasValue<OrderStock>("Order")
-            .HasValue<ShipmentStock>("Shipment")
-            .HasValue<TransferStock>("Transfer");
-
-
+                .ToTable("Stocks")
+                .HasDiscriminator<string>("StockType")
+                .HasValue<OrderStock>("Order")
+                .HasValue<ShipmentStock>("Shipment")
+                .HasValue<TransferStock>("Transfer");
         }
 
 

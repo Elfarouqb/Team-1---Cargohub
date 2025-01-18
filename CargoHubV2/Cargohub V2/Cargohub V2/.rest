@@ -12,7 +12,7 @@ Accept: application/json
 ###
 
 # GET items in a shipment by shipment ID
-GET http://localhost:5285/api/shipments/5/items
+GET http://localhost:5285/api/shipments/8/items
 Accept: application/json
 
 ###
@@ -22,7 +22,7 @@ POST  http://localhost:5285/api/shipments
 Content-Type: application/json
 
 {
-  "orderId": 8,
+  "orderId": "8",
   "sourceId": 456,
   "orderDate": "2024-12-13T10:00:00Z",
   "requestDate": "2024-12-14T10:00:00Z",
@@ -58,6 +58,7 @@ Content-Type: application/json
 
 {
   "sourceId": 457,
+  "orderId" : "10",
   "orderDate": "2024-12-14T10:00:00Z",
   "requestDate": "2024-12-15T10:00:00Z",
   "shipmentDate": "2024-12-16T10:00:00Z",
@@ -70,35 +71,25 @@ Content-Type: application/json
   "paymentType": "Collect",
   "transferMode": "Land",
   "totalPackageCount": 7,
-  "totalPackageWeight": 70.0,
-    "items": [
-    {
-      "itemId": "P007435",
-      "amount": 23
-    },
-    {
-      "itemId": "P009557",
-      "amount": 1
-    }
-  ]
+  "totalPackageWeight": 70.0
 }
 
 
 ###
 
 # PUT (update) items in a shipment by shipment ID
-PUT http://localhost:5285/api/shipments/5/items
+PUT http://localhost:5285/api/shipments/8/items
 Content-Type: application/json
 
 [
   {
     "itemId": "P007435",
-    "quantity": 10,
+    "amount": 10,
     "weight": 5.0
   },
   {
     "itemId": "P009557",
-    "quantity": 20,
+    "amount": 20,
     "weight": 10.0
   }
 ]
