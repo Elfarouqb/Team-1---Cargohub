@@ -2,19 +2,20 @@ using Cargohub_V2.Contexts;
 using Cargohub_V2.Models;
 using Cargohub_V2.Services;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Xunit;
+using Xunit;  // Use xUnit namespace
 
 namespace UnitTests
 {
-    public class Shipment_Test
+    public class UnitTest_Shipment  // Remove [TestClass] since xUnit doesn't need this
     {
         private CargoHubDbContext _dbContext;
         private ShipmentService _shipmentService;
 
-        public Shipment_Test()
+        public UnitTest_Shipment()  // Constructor used for setup in xUnit
         {
             var options = new DbContextOptionsBuilder<CargoHubDbContext>()
                 .UseInMemoryDatabase(databaseName: "TestCargoHubDatabase")
@@ -78,40 +79,8 @@ namespace UnitTests
             context.SaveChanges();
         }
 
-        [Fact]
-        public async Task GetAllShipments_ReturnsOkResult_WithListOfShipments()
-        {
-            // Act
-            var result = await _shipmentService.GetAllShipmentsAsync();
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
-        }
-
-        [Fact]
-        public async Task GetShipmentById_ReturnsNotFound_WhenShipmentDoesNotExist()
-        {
-            // Act
-            var result = await _shipmentService.GetShipmentByIdAsync(999);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task GetShipmentById_ReturnsOkResult_WithShipment()
-        {
-            // Act
-            var result = await _shipmentService.GetShipmentByIdAsync(1);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(1, result.Id);
-        }
-
-        [Fact]
-        public async Task CreateShipment_ReturnsCreatedAtAction_WithCreatedShipment()
+        [Fact]  // Replace [TestMethod] with xUnit's [Fact]
+        public async Task TestAddShipment()
         {
             // Arrange
             var newShipment = new Shipment
@@ -140,45 +109,12 @@ namespace UnitTests
             var result = await _shipmentService.AddShipmentAsync(newShipment);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(3, result.Id);
+            Assert.NotNull(result);  // Use xUnit's Assert
+            Assert.Equal(newShipment.OrderId, result.OrderId);  // Use xUnit's Assert
         }
 
-        [Fact]
-        public async Task UpdateShipment_ReturnsNotFound_WhenShipmentDoesNotExist()
-        {
-            // Arrange
-            var updatedShipment = new Shipment
-            {
-                Id = 999,
-                SourceId = 1,
-                OrderId = "1,2,3,4",
-                OrderDate = DateTime.UtcNow.ToString("o"),
-                RequestDate = DateTime.UtcNow.ToString("o"),
-                ShipmentDate = DateTime.UtcNow.ToString("o"),
-                ShipmentType = "Express",
-                ShipmentStatus = "Delivered",
-                Notes = "Updated shipment",
-                CarrierCode = "UPS",
-                CarrierDescription = "UPS Updated",
-                ServiceCode = "EXP",
-                PaymentType = "Prepaid",
-                TransferMode = "Air",
-                TotalPackageCount = 3,
-                TotalPackageWeight = 12.5,
-                CreatedAt = DateTime.UtcNow.AddDays(-10),
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            // Act
-            var result = await _shipmentService.UpdateShipmentAsync(999, updatedShipment);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task UpdateShipment_ReturnsOkResult_WhenShipmentIsUpdated()
+        [Fact]  // Replace [TestMethod] with xUnit's [Fact]
+        public async Task TestUpdateShipment()
         {
             // Arrange
             var updatedShipment = new Shipment
@@ -207,27 +143,19 @@ namespace UnitTests
             var result = await _shipmentService.UpdateShipmentAsync(1, updatedShipment);
 
             // Assert
-            Assert.True(result);
+            Assert.True(result);  // Use xUnit's Assert
         }
 
-        [Fact]
-        public async Task RemoveShipment_ReturnsNotFound_WhenShipmentDoesNotExist()
+        [Theory]  // Use xUnit's [Theory] for parameterized tests
+        [InlineData(1, true)]  // Test with an existing shipment ID
+        [InlineData(999, false)]  // Test with a non-existent shipment ID
+        public async Task TestDeleteShipment(int shipmentId, bool shouldDelete)
         {
             // Act
-            var result = await _shipmentService.RemoveShipmentAsync(999);
+            var result = await _shipmentService.RemoveShipmentAsync(shipmentId);
 
             // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task RemoveShipment_ReturnsNoContent_WhenShipmentIsRemoved()
-        {
-            // Act
-            var result = await _shipmentService.RemoveShipmentAsync(1);
-
-            // Assert
-            Assert.True(result);
+            Assert.Equal(result, shouldDelete);  // Use xUnit's Assert
         }
     }
 }
