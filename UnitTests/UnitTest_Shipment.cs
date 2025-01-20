@@ -1,8 +1,8 @@
-using Cargohub_V2.Controllers;
+using Cargohub_V2.Contexts;
 using Cargohub_V2.Models;
 using Cargohub_V2.Services;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -11,136 +11,223 @@ namespace UnitTests
 {
     public class Shipment_Test
     {
-        private readonly Mock<ShipmentService> _mockShipmentService;
-        private readonly ShipmentsController _controller;
+        private CargoHubDbContext _dbContext;
+        private ShipmentService _shipmentService;
 
         public Shipment_Test()
         {
-            _mockShipmentService = new Mock<ShipmentService>(null);
-            _controller = new ShipmentsController(_mockShipmentService.Object);
+            var options = new DbContextOptionsBuilder<CargoHubDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestCargoHubDatabase")
+                .Options;
+
+            _dbContext = new CargoHubDbContext(options);
+            SeedDatabase(_dbContext);
+            _shipmentService = new ShipmentService(_dbContext);
+        }
+
+        private void SeedDatabase(CargoHubDbContext context)
+        {
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            // Seed Shipments
+            context.Shipments.Add(new Shipment
+            {
+                Id = 1,
+                SourceId = 1,
+                OrderId = "4",
+                OrderDate = DateTime.UtcNow.AddDays(-5).ToString("o"),
+                RequestDate = DateTime.UtcNow.AddDays(-3).ToString("o"),
+                ShipmentDate = DateTime.UtcNow.AddDays(-1).ToString("o"),
+                ShipmentType = "Express",
+                ShipmentStatus = "Shipped",
+                Notes = "Test shipment",
+                CarrierCode = "UPS",
+                CarrierDescription = "UPS Express",
+                ServiceCode = "EXP",
+                PaymentType = "Prepaid",
+                TransferMode = "Air",
+                TotalPackageCount = 2,
+                TotalPackageWeight = 10.5,
+                CreatedAt = DateTime.UtcNow.AddDays(-10),
+                UpdatedAt = DateTime.UtcNow.AddDays(-5)
+            });
+
+            context.Shipments.Add(new Shipment
+            {
+                Id = 2,
+                SourceId = 2,
+                OrderId = "1,2,3",
+                OrderDate = DateTime.UtcNow.AddDays(-7).ToString("o"),
+                RequestDate = DateTime.UtcNow.AddDays(-4).ToString("o"),
+                ShipmentDate = DateTime.UtcNow.AddDays(-2).ToString("o"),
+                ShipmentType = "Standard",
+                ShipmentStatus = "Pending",
+                Notes = "Another test shipment",
+                CarrierCode = "FedEx",
+                CarrierDescription = "FedEx Standard",
+                ServiceCode = "STP",
+                PaymentType = "Collect",
+                TransferMode = "Truck",
+                TotalPackageCount = 5,
+                TotalPackageWeight = 25.0,
+                CreatedAt = DateTime.UtcNow.AddDays(-15),
+                UpdatedAt = DateTime.UtcNow.AddDays(-7)
+            });
+
+            context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAllShipments_ReturnsOkResult_WithListOfShipments()
         {
-            // Arrange
-            var shipments = new List<Shipment> { new Shipment { Id = 1 }, new Shipment { Id = 2 } };
-            _mockShipmentService.Setup(service => service.GetAllShipmentsAsync()).ReturnsAsync(shipments);
-
             // Act
-            var result = await _controller.GetAllShipments();
+            var result = await _shipmentService.GetAllShipmentsAsync();
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnShipments = Assert.IsType<List<Shipment>>(okResult.Value);
-            Assert.Equal(2, returnShipments.Count);
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
         }
 
         [Fact]
         public async Task GetShipmentById_ReturnsNotFound_WhenShipmentDoesNotExist()
         {
-            // Arrange
-            _mockShipmentService.Setup(service => service.GetShipmentByIdAsync(It.IsAny<int>())).ReturnsAsync((Shipment)null);
-
             // Act
-            var result = await _controller.GetShipmentById(1);
+            var result = await _shipmentService.GetShipmentByIdAsync(999);
 
             // Assert
-            Assert.IsType<NotFoundResult>(result.Result);
+            Assert.Null(result);
         }
 
         [Fact]
         public async Task GetShipmentById_ReturnsOkResult_WithShipment()
         {
-            // Arrange
-            var shipment = new Shipment { Id = 1 };
-            _mockShipmentService.Setup(service => service.GetShipmentByIdAsync(It.IsAny<int>())).ReturnsAsync(shipment);
-
             // Act
-            var result = await _controller.GetShipmentById(1);
+            var result = await _shipmentService.GetShipmentByIdAsync(1);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnShipment = Assert.IsType<Shipment>(okResult.Value);
-            Assert.Equal(1, returnShipment.Id);
-        }
-
-        [Fact]
-        public async Task CreateShipment_ReturnsBadRequest_WhenShipmentIsNull()
-        {
-            // Act
-            var result = await _controller.CreateShipment(null);
-
-            // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Shipment cannot be null.", badRequestResult.Value);
+            Assert.NotNull(result);
+            Assert.Equal(1, result.Id);
         }
 
         [Fact]
         public async Task CreateShipment_ReturnsCreatedAtAction_WithCreatedShipment()
         {
             // Arrange
-            var shipment = new Shipment { Id = 1 };
-            _mockShipmentService.Setup(service => service.AddShipmentAsync(It.IsAny<Shipment>())).ReturnsAsync(shipment);
+            var newShipment = new Shipment
+            {
+                Id = 3,
+                SourceId = 3,
+                OrderId = "15,27",
+                OrderDate = DateTime.UtcNow.ToString("o"),
+                RequestDate = DateTime.UtcNow.ToString("o"),
+                ShipmentDate = DateTime.UtcNow.ToString("o"),
+                ShipmentType = "Standard",
+                ShipmentStatus = "Pending",
+                Notes = "New shipment",
+                CarrierCode = "DHL",
+                CarrierDescription = "DHL Standard",
+                ServiceCode = "STF",
+                PaymentType = "Prepaid",
+                TransferMode = "Truck",
+                TotalPackageCount = 3,
+                TotalPackageWeight = 15.0,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             // Act
-            var result = await _controller.CreateShipment(shipment);
+            var result = await _shipmentService.AddShipmentAsync(newShipment);
 
             // Assert
-            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
-            var returnShipment = Assert.IsType<Shipment>(createdAtActionResult.Value);
-            Assert.Equal(1, returnShipment.Id);
-        }
-
-        [Fact]
-        public async Task UpdateShipment_ReturnsBadRequest_WhenShipmentIsNull()
-        {
-            // Act
-            var result = await _controller.UpdateShipment(1, null);
-
-            // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Invalid shipment data.", badRequestResult.Value);
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Id);
         }
 
         [Fact]
         public async Task UpdateShipment_ReturnsNotFound_WhenShipmentDoesNotExist()
         {
             // Arrange
-            _mockShipmentService.Setup(service => service.UpdateShipmentAsync(It.IsAny<int>(), It.IsAny<Shipment>())).ReturnsAsync(false);
+            var updatedShipment = new Shipment
+            {
+                Id = 999,
+                SourceId = 1,
+                OrderId = "1,2,3,4",
+                OrderDate = DateTime.UtcNow.ToString("o"),
+                RequestDate = DateTime.UtcNow.ToString("o"),
+                ShipmentDate = DateTime.UtcNow.ToString("o"),
+                ShipmentType = "Express",
+                ShipmentStatus = "Delivered",
+                Notes = "Updated shipment",
+                CarrierCode = "UPS",
+                CarrierDescription = "UPS Updated",
+                ServiceCode = "EXP",
+                PaymentType = "Prepaid",
+                TransferMode = "Air",
+                TotalPackageCount = 3,
+                TotalPackageWeight = 12.5,
+                CreatedAt = DateTime.UtcNow.AddDays(-10),
+                UpdatedAt = DateTime.UtcNow
+            };
 
             // Act
-            var result = await _controller.UpdateShipment(1, new Shipment());
+            var result = await _shipmentService.UpdateShipmentAsync(999, updatedShipment);
 
             // Assert
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("Shipment with ID 1 not found.", notFoundResult.Value);
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task UpdateShipment_ReturnsOkResult_WhenShipmentIsUpdated()
+        {
+            // Arrange
+            var updatedShipment = new Shipment
+            {
+                Id = 1,
+                SourceId = 1,
+                OrderId = "1,2,3,4",
+                OrderDate = DateTime.UtcNow.ToString("o"),
+                RequestDate = DateTime.UtcNow.ToString("o"),
+                ShipmentDate = DateTime.UtcNow.ToString("o"),
+                ShipmentType = "Express",
+                ShipmentStatus = "Delivered",
+                Notes = "Updated shipment",
+                CarrierCode = "UPS",
+                CarrierDescription = "UPS Updated",
+                ServiceCode = "EXP",
+                PaymentType = "Prepaid",
+                TransferMode = "Air",
+                TotalPackageCount = 3,
+                TotalPackageWeight = 12.5,
+                CreatedAt = DateTime.UtcNow.AddDays(-10),
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            // Act
+            var result = await _shipmentService.UpdateShipmentAsync(1, updatedShipment);
+
+            // Assert
+            Assert.True(result);
         }
 
         [Fact]
         public async Task RemoveShipment_ReturnsNotFound_WhenShipmentDoesNotExist()
         {
-            // Arrange
-            _mockShipmentService.Setup(service => service.RemoveShipmentAsync(It.IsAny<int>())).ReturnsAsync(false);
-
             // Act
-            var result = await _controller.RemoveShipment(1);
+            var result = await _shipmentService.RemoveShipmentAsync(999);
 
             // Assert
-            Assert.IsType<NotFoundResult>(result);
+            Assert.False(result);
         }
 
         [Fact]
         public async Task RemoveShipment_ReturnsNoContent_WhenShipmentIsRemoved()
         {
-            // Arrange
-            _mockShipmentService.Setup(service => service.RemoveShipmentAsync(It.IsAny<int>())).ReturnsAsync(true);
-
             // Act
-            var result = await _controller.RemoveShipment(1);
+            var result = await _shipmentService.RemoveShipmentAsync(1);
 
             // Assert
-            Assert.IsType<NoContentResult>(result);
+            Assert.True(result);
         }
     }
 }
