@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Team-1---Cargohub\CargoHubV2\CargohubV2.csproj" />
+    <ProjectReference Include="..\Team-1---Cargohub/CargohubV2/Cargohub V2/Cargohub V2/CargohubV2.csproj" />
   </ItemGroup>
 
 </Project>
