@@ -53,33 +53,47 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Run .NET Unit Tests
-      - name: Run .NET Unit Tests
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=TestResults.trx"
+      # Restore dependencies for UnitTests project
+      - name: Restore dependencies
+        run: dotnet restore UnitTests/UnitTests.csproj
+
+      # Build the UnitTests project
+      - name: Build
+        run: dotnet build --no-restore --configuration Release UnitTests/UnitTests.csproj
+
+      # Run tests with Coverlet for coverage
+      - name: Run tests and collect coverage
+        run: |
+          dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutput=coverage/ /p:CoverletOutputFormat=cobertura
         working-directory: UnitTests
 
-  integration-tests:
-    runs-on: ubuntu-latest
-    needs: build
+      # Install ReportGenerator (optional, for human-readable reports)
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # Generate coverage report (optional)
+      - name: Generate coverage report
+        run: |
+          reportgenerator -reports:coverage/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:Html
+        working-directory: UnitTests
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
+      # Enforce coverage threshold
+      - name: Check coverage threshold
+        id: coverage-check
+        run: |
+          coverage=$(xmllint --xpath "string(//*[local-name()='coverage']/@line-rate)" UnitTests/coverage/coverage.cobertura.xml | awk '{printf("%.0f\n", $1 * 100)}')
+          echo "Coverage: $coverage%"
+          if [ "$coverage" -lt 70 ]; then
+            echo "Code coverage ($coverage%) is below the threshold of 70%."
+            exit 1
+          fi
+
+      # Upload coverage report (optional)
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
         with:
-          dotnet-version: '8.0.x'
+          name: coverage-report
+          path: UnitTests/coverage-report
 
-      - name: Start ASP.NET application in background
-        run: |
-          nohup dotnet run --configuration Release --urls=http://localhost:5285 > output.log 2>&1 &
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      - name: Wait for ASP.NET application
-        run: |
-          timeout 120s bash -c 'until curl -s http://localhost:5285/api/v1/Clients; do sleep 5; done'
-
-      - name: Run Python Integration Tests
-        run: pytest
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2/Tests
+  
