@@ -17,9 +17,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # List the directory structure for debugging
-      - name: List Files in CargohubV2
-        run: ls -R CargohubV2
+      # Debug directory structure
+      - name: List Files
+        run: ls -R
+        working-directory: CargoHubV2
 
       # Set up .NET SDK for .NET 8.0
       - name: Setup .NET SDK
@@ -27,14 +28,17 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Restore .NET dependencies for the main project
+      # Restore .NET dependencies
       - name: Restore dependencies
-        run: |
-          dotnet restore "CargohubV2/Cargohub V2/Cargohub V2/CargohubV2.csproj"
+        run: dotnet restore
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Build the application
-      - name: Build main project
-        run: dotnet build --no-restore --configuration Release "CargohubV2/Cargohub V2/Cargohub V2/CargohubV2.csproj"
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+
+
 
 
   unit-tests:
