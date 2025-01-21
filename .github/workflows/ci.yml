@@ -56,7 +56,7 @@ jobs:
       # Run .NET Unit Tests
       - name: Run .NET Unit Tests
         run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=TestResults.trx"
-        working-directory: Team-1---Cargohub/UnitTests
+        working-directory: UnitTests
 
   integration-tests:
     runs-on: ubuntu-latest
