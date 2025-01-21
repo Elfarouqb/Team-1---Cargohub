@@ -6,14 +6,23 @@ namespace Cargohub_V2.Contexts
     public class CargoHubDbContext : DbContext
     {
         protected readonly IConfiguration Configuration;
+
         public CargoHubDbContext(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        public CargoHubDbContext(DbContextOptions<CargoHubDbContext> options)
+            : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
+            if (Configuration != null)
+            {
+                optionsBuilder.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
