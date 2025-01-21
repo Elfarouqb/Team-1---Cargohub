@@ -50,23 +50,20 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Restore .NET dependencies for the UnitTests project
-      - name: Restore dependencies (Unit Tests)
-        run: dotnet restore
-        working-directory: UnitTests
+    # Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore UnitTests/UnitTests.csproj
 
-      # Run unit tests for the UnitTests project
+    # Build the project
+      - name: Build
+        run: dotnet build --no-restore --configuration Release UnitTests/UnitTests.csproj
+
+    # Run unit tests for the UnitTests project
       - name: Run unit tests
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
-        working-directory: .
+        working-directory: UnitTests
 
-      # Upload test results
-      - name: Upload test results
-        if: always()  # Always run this step, regardless of success/failure
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: ./UnitTests/test-results
+
 
 
