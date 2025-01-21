@@ -29,11 +29,11 @@ jobs:
 
       # Restore .NET dependencies for the main project
       - name: Restore dependencies
-        run: dotnet restore CargohubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
+        run: dotnet restore "CargohubV2/Cargohub V2/CargohubV2.csproj"
 
       # Build the application
       - name: Build main project
-        run: dotnet build --no-restore --configuration Release CargohubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
+        run: dotnet build --no-restore --configuration Release "CargohubV2/Cargohub V2/CargohubV2.csproj"
 
   unit-tests:
     runs-on: ubuntu-latest
