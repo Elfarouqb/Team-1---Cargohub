@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Configuration;
 
 namespace UnitTests
 {
@@ -17,12 +18,18 @@ namespace UnitTests
 
         public UnitTest_Shipment()
         {
+            // In-memory database for testing (no need for PostgreSQL credentials)
             var options = new DbContextOptionsBuilder<CargoHubDbContext>()
                 .UseInMemoryDatabase(databaseName: "TestShipmentDatabase")
                 .Options;
 
+            // Initialize the DbContext with the in-memory database options
             _dbContext = new CargoHubDbContext(options);
+
+            // Seed the database
             SeedDatabase(_dbContext);
+
+            // Initialize the OrderService
             _shipmentService = new ShipmentService(_dbContext);
         }
 
