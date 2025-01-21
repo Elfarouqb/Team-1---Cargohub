@@ -37,18 +37,36 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # Run unit tests for the UnitTests project (after build is successful)
+  test:
+    runs-on: ubuntu-latest
+    needs: build  # Ensures this job runs only after the build job is successful
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up .NET SDK for .NET 8.0
+      - name: Setup .NET SDK for testing
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restore .NET dependencies for the UnitTests project
+      - name: Restore dependencies (Unit Tests)
+        run: dotnet restore
+        working-directory: UnitTests
+
+      # Run unit tests for the UnitTests project
       - name: Run unit tests
         run: |
-          mkdir -p test-results
-          dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./test-results
-        working-directory: ./UnitTests
+          dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+        working-directory: .
 
       # Upload test results
       - name: Upload test results
-        if: always()
+        if: always()  # Always run this step, regardless of success/failure
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: ./UnitTests/test-results
+
 
