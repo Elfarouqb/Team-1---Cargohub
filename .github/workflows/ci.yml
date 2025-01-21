@@ -29,11 +29,11 @@ jobs:
 
       # Restore .NET dependencies for the main project
       - name: Restore dependencies
-        run: dotnet restore CargoHubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
+        run: dotnet restore CargohubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
 
       # Build the application
       - name: Build main project
-        run: dotnet build --no-restore --configuration Release CargoHubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
+        run: dotnet build --no-restore --configuration Release CargohubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -52,17 +52,17 @@ jobs:
 
       # Restore dependencies for UnitTests project
       - name: Restore dependencies for UnitTests
-        run: dotnet restore UnitTests/UnitTests.csproj
+        run: dotnet restore Unittests/UnitTests.csproj
 
       # Build the UnitTests project
       - name: Build UnitTests project
-        run: dotnet build --no-restore --configuration Release UnitTests/UnitTests.csproj
+        run: dotnet build --no-restore --configuration Release Unittests/UnitTests.csproj
 
       # Run tests with Coverlet for coverage
       - name: Run tests and collect coverage
         run: |
           dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutput=coverage/ /p:CoverletOutputFormat=cobertura
-        working-directory: UnitTests
+        working-directory: Unittests
 
       # Install ReportGenerator (optional, for human-readable reports)
       - name: Install ReportGenerator
@@ -72,13 +72,13 @@ jobs:
       - name: Generate coverage report
         run: |
           reportgenerator -reports:coverage/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:Html
-        working-directory: UnitTests
+        working-directory: Unittests
 
       # Enforce coverage threshold
       - name: Check coverage threshold
         id: coverage-check
         run: |
-          coverage=$(xmllint --xpath "string(//*[local-name()='coverage']/@line-rate)" UnitTests/coverage/coverage.cobertura.xml | awk '{printf("%.0f\n", $1 * 100)}')
+          coverage=$(xmllint --xpath "string(//*[local-name()='coverage']/@line-rate)" Unittests/coverage/coverage.cobertura.xml | awk '{printf("%.0f\n", $1 * 100)}')
           echo "Coverage: $coverage%"
           if [ "$coverage" -lt 70 ]; then
             echo "Code coverage ($coverage%) is below the threshold of 70%."
@@ -90,7 +90,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage-report
-          path: UnitTests/coverage-report
+          path: Unittests/coverage-report
+
 
 
   
