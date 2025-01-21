@@ -5,23 +5,24 @@ namespace Cargohub_V2.Contexts
 {
     public class CargoHubDbContext : DbContext
     {
-        protected readonly IConfiguration Configuration;
+        private readonly IConfiguration _configuration;
 
         public CargoHubDbContext(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public CargoHubDbContext(DbContextOptions<CargoHubDbContext> options)
-            : base(options)
-        {
-        }
+        public CargoHubDbContext(DbContextOptions<CargoHubDbContext> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (Configuration != null)
+            if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
+                if (_configuration == null)
+                {
+                    throw new InvalidOperationException("Configuration is required when DbContextOptions is not configured.");
+                }
+                optionsBuilder.UseNpgsql(_configuration.GetConnectionString("WebApiDatabase"));
             }
         }
 
