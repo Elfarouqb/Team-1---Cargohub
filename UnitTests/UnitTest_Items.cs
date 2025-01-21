@@ -11,15 +11,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace UnitTests
 {
-    public class UnitTest_ItemLines
+    public class UnitTest_Item
     {
         private CargoHubDbContext _dbContext;
-        private ItemLineService _itemLineService;
+        private ItemService _itemService;
         public UnitTest_Order()
         {
             // In-memory database for testing (no need for PostgreSQL credentials)
             var options = new DbContextOptionsBuilder<CargoHubDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestItemLineTypeDatabase")
+                .UseInMemoryDatabase(databaseName: "TestItemDatabase")
                 .Options;
 
             // Initialize the DbContext with the in-memory database options
@@ -29,7 +29,7 @@ namespace UnitTests
             SeedDatabase(_dbContext);
 
             // Initialize the OrderService
-            _itemLineService = new ItemLineService(_dbContext);
+            _itemService = new ItemService(_dbContext);
         }
 
         private void SeedDatabase(CargoHubDbContext context)

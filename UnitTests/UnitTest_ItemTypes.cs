@@ -7,36 +7,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Configuration;
 
-//use dotnet test for running tests
 namespace UnitTests
 {
-    public class UnitTest_Shipment
+    public class UnitTest_ItemTypes
     {
         private CargoHubDbContext _dbContext;
-        private ShipmentService _shipmentService;
-
-        public UnitTest_Shipment()
+        private ItemTypeService _itemTypeService;
+        public UnitTest_Order()
         {
+            // In-memory database for testing (no need for PostgreSQL credentials)
             var options = new DbContextOptionsBuilder<CargoHubDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestItemDatabase")
+                .UseInMemoryDatabase(databaseName: "TestItemTypeDatabase")
                 .Options;
 
+            // Initialize the DbContext with the in-memory database options
             _dbContext = new CargoHubDbContext(options);
+
+            // Seed the database
             SeedDatabase(_dbContext);
-            _shipmentService = new ShipmentService(_dbContext);
+
+            // Initialize the OrderService
+            _itemTypeService = new ItemTypeService(_dbContext);
         }
 
         private void SeedDatabase(CargoHubDbContext context)
         {
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
-
-            context.Items.AddRange(
-            //fill data 
-            new Item { },
-
-        );
+            //fill with seeddata
         }
+
     }
+
 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Configuration;
 
 namespace UnitTests
 {
@@ -17,12 +18,18 @@ namespace UnitTests
 
         public UnitTest_Shipment()
         {
+            // In-memory database for testing (no need for PostgreSQL credentials)
             var options = new DbContextOptionsBuilder<CargoHubDbContext>()
                 .UseInMemoryDatabase(databaseName: "TestShipmentDatabase")
                 .Options;
 
+            // Initialize the DbContext with the in-memory database options
             _dbContext = new CargoHubDbContext(options);
+
+            // Seed the database
             SeedDatabase(_dbContext);
+
+            // Initialize the OrderService
             _shipmentService = new ShipmentService(_dbContext);
         }
 
@@ -316,7 +323,7 @@ namespace UnitTests
         [Fact]
         public async Task TestUpdateItemsInShipmentAsync()
         {
-            //items to update for shipment 1
+            // items to update for shipment 1
             var updatedItems = new List<ShipmentItem>
             {
                 new ShipmentItem { ItemId = "P007439", Amount = 4 },
@@ -340,17 +347,17 @@ namespace UnitTests
         [Fact]
         public async Task TestUpdateItemsInNonExistentShipmentAsync()
         {
-            //items to update for a non-existent shipment
+            // New items to update for a non-existent shipment (ID = 999)
             var updatedItems = new List<ShipmentItem>
             {
                 new ShipmentItem { ItemId = "P007441", Amount = 7 },
                 new ShipmentItem { ItemId = "P007442", Amount = 8 }
             };
 
-            //updating items for shipment ID = 999
+            // Try updating items for shipment ID = 999, which doesn't exist
             var result = await _shipmentService.UpdateItemsInShipmentAsync(999, updatedItems);
 
-
+            // Ensure the update is unsuccessful
             Assert.False(result);
         }
     }
