@@ -20,7 +20,6 @@ jobs:
       # Debug directory structure
       - name: List Files
         run: ls -R
-        working-directory: CargoHubV2
 
       # Set up .NET SDK for .NET 8.0
       - name: Setup .NET SDK
@@ -28,15 +27,13 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Restore .NET dependencies
+      # Restore .NET dependencies for the main project
       - name: Restore dependencies
-        run: dotnet restore
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+        run: dotnet restore CargoHubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
 
       # Build the application
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+      - name: Build main project
+        run: dotnet build --no-restore --configuration Release CargoHubV2/Cargohub\ V2/Cargohub\ V2/CargohubV2.csproj
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -54,11 +51,11 @@ jobs:
           dotnet-version: '8.0.x'
 
       # Restore dependencies for UnitTests project
-      - name: Restore dependencies
+      - name: Restore dependencies for UnitTests
         run: dotnet restore UnitTests/UnitTests.csproj
 
       # Build the UnitTests project
-      - name: Build
+      - name: Build UnitTests project
         run: dotnet build --no-restore --configuration Release UnitTests/UnitTests.csproj
 
       # Run tests with Coverlet for coverage
