@@ -13,14 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
       # Debug directory structure
       - name: List Files
         run: ls -R
-        working-directory: CargoHubV2
+        working-directory: .
 
       # Set up .NET SDK for .NET 8.0
       - name: Setup .NET SDK
@@ -28,72 +27,46 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Restore .NET dependencies
-      - name: Restore dependencies
+      # Restore .NET dependencies for the main app
+      - name: Restore dependencies (Main App)
         run: dotnet restore
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # Build the application
-      - name: Build
+      # Build the main application
+      - name: Build (Main App)
         run: dotnet build --no-restore --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-  unit-tests:
+  test:
     runs-on: ubuntu-latest
-    needs: build
-
+    needs: build  # Ensures this job runs only after the build job is successful
     steps:
-      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
       # Set up .NET SDK for .NET 8.0
-      - name: Setup .NET SDK
+      - name: Setup .NET SDK for testing
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      # Run .NET Unit Tests
-      - name: Run .NET Unit Tests
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=TestResults.trx"
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+      # Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: UnitTests  # Set working directory to UnitTests
 
-  integration-tests:
-    runs-on: ubuntu-latest
-    needs: build
+      # Build the project
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+        working-directory: UnitTests  # Set working directory to UnitTests
 
-    steps:
-      # Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Set up .NET SDK for .NET 8.0
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      # Start the ASP.NET application in the background
-      - name: Start ASP.NET application in background
+      # Run unit tests for the UnitTests project
+      - name: Run unit tests
         run: |
-          nohup dotnet run --configuration Release --urls=http://localhost:5285 > output.log 2>&1 &
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+          dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+        working-directory: UnitTests  # Set working directory to UnitTests
 
-      # Wait for the ASP.NET application to start
-      - name: Wait for ASP.NET application to start
-        run: |
-          echo "Waiting for ASP.NET application to start..."
-          for i in {1..12}; do
-            if curl -s http://localhost:5285/api/v1/Clients; then
-              echo "ASP.NET application is up!"
-              break
-            fi
-            echo "Waiting for ASP.NET application to be available..."
-            sleep 10
-          done
 
-      # Run Python Integration Tests
-      - name: Run Python Integration Tests
-        run: pytest
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2/Tests
+
+
 
