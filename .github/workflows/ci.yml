@@ -50,19 +50,22 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-    # Restore dependencies
+      # Restore dependencies
       - name: Restore dependencies
-        run: dotnet restore UnitTests/UnitTests.csproj
+        run: dotnet restore
+        working-directory: UnitTests  # Set working directory to UnitTests
 
-    # Build the project
+      # Build the project
       - name: Build
-        run: dotnet build --no-restore --configuration Release UnitTests/UnitTests.csproj
+        run: dotnet build --no-restore --configuration Release
+        working-directory: UnitTests  # Set working directory to UnitTests
 
-    # Run unit tests for the UnitTests project
+      # Run unit tests for the UnitTests project
       - name: Run unit tests
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
-        working-directory: UnitTests
+        working-directory: UnitTests  # Set working directory to UnitTests
+
 
 
 
