@@ -39,13 +39,16 @@ jobs:
 
       # Run unit tests for the UnitTests project (after build is successful)
       - name: Run unit tests
-        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+        run: |
+          mkdir -p test-results
+          dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./test-results
         working-directory: ./UnitTests
 
-      # Publish test results (Optional, for reporting in GitHub Actions UI)
+      # Upload test results
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: $(System.DefaultWorkingDirectory)/TestResults
+          path: ./UnitTests/test-results
+
