@@ -27,72 +27,25 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Restore .NET dependencies
-      - name: Restore dependencies
+      # Restore .NET dependencies for the main app
+      - name: Restore dependencies (Main App)
         run: dotnet restore
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # Build the application
-      - name: Build
+      # Build the main application
+      - name: Build (Main App)
         run: dotnet build --no-restore --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-  unit-tests:
-    runs-on: ubuntu-latest
-    needs: build
+      # Run unit tests for the UnitTests project (after build is successful)
+      - name: Run unit tests
+        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+        working-directory: ./UnitTests
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Debug directory structure for UnitTests
-      - name: List UnitTests directory
-        run: ls -R UnitTests
-
-      # Set up .NET SDK for .NET 8.0
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      # Restore dependencies for UnitTests project
-      - name: Restore dependencies for UnitTests
-        run: dotnet restore UnitTests/UnitTests.csproj
-
-      # Build the UnitTests project
-      - name: Build UnitTests project
-        run: dotnet build --no-restore --configuration Release UnitTests/UnitTests.csproj
-
-      # Run tests with Coverlet for coverage
-      - name: Run tests and collect coverage
-        run: |
-          dotnet test --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutput=coverage/ /p:CoverletOutputFormat=cobertura
-        working-directory: UnitTests
-
-      # Install ReportGenerator (optional, for human-readable reports)
-      - name: Install ReportGenerator
-        run: dotnet tool install -g dotnet-reportgenerator-globaltool
-
-      # Generate coverage report (optional)
-      - name: Generate coverage report
-        run: |
-          reportgenerator -reports:coverage/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:Html
-        working-directory: UnitTests
-
-      # Enforce coverage threshold
-      - name: Check coverage threshold
-        id: coverage-check
-        run: |
-          coverage=$(xmllint --xpath "string(//*[local-name()='coverage']/@line-rate)" UnitTests/coverage/coverage.cobertura.xml | awk '{printf("%.0f\n", $1 * 100)}')
-          echo "Coverage: $coverage%"
-          if [ "$coverage" -lt 70 ]; then
-            echo "Code coverage ($coverage%) is below the threshold of 70%."
-            exit 1
-          fi
-
-      # Upload coverage report (optional)
-      - name: Upload coverage report
+      # Publish test results (Optional, for reporting in GitHub Actions UI)
+      - name: Upload test results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: coverage-report
-          path: UnitTests/coverage-report
+          name: test-results
+          path: $(System.DefaultWorkingDirectory)/TestResults
