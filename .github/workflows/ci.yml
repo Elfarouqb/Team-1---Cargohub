@@ -53,20 +53,15 @@ jobs:
       # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: UnitTests  # Set working directory to UnitTests
+        working-directory: UnitTests  # Ensure this points to the correct path
 
       # Build the project
       - name: Build
         run: dotnet build --no-restore --configuration Release
-        working-directory: UnitTests  # Set working directory to UnitTests
+        working-directory: UnitTests  # Ensure this points to the correct path
 
       # Run unit tests for the UnitTests project
       - name: Run unit tests
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
-        working-directory: UnitTests  # Set working directory to UnitTests
-
-
-
-
-
+        working-directory: UnitTests  # Ensure this points to the correct path
