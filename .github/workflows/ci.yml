@@ -37,6 +37,17 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
+      # Static code analysis using GitHub CodeQL
+      # Static code analysis using GitHub CodeQL
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'csharp'
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+
   test:
     runs-on: ubuntu-latest
     needs: build  # Ensures this job runs only after the build job is successful
@@ -44,7 +55,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up .NET SDK for .NET 8.0
+      # Set up .NET SDK for testing
       - name: Setup .NET SDK for testing
         uses: actions/setup-dotnet@v3
         with:
@@ -65,3 +76,39 @@ jobs:
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
         working-directory: UnitTests  # Ensure this points to the correct path
+
+      # Check code coverage threshold (Optional: enforce a minimum code coverage percentage)
+      - name: Check code coverage
+        run: |
+          COVERAGE=$(dotnet reportgenerator -reports:coverage.cobertura.xml -targetdir:coverage-report)
+          if [[ $(echo "$COVERAGE" | grep -oP "Coverage: \K\d+" | head -n 1) -lt 80 ]]; then
+            echo "Code coverage is below the minimum threshold of 80%. Please fix the issues.";
+            exit 1;
+          fi
+        working-directory: UnitTests  # Ensure this points to the correct path
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test  # Ensures this job runs only after the test job is successful
+    if: success()  # Proceed only if the previous jobs were successful
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up .NET SDK for deployment (if needed)
+      - name: Setup .NET SDK for deployment
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # Deploy the app (example for production)
+      - name: Deploy to Production
+        run: ./deploy.sh  # Replace with your actual deployment script
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Notify via Slack (or other channels)
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Deployment completed successfully for CargoHub!"}' ${{ secrets.SLACK_WEBHOOK_URL }}
