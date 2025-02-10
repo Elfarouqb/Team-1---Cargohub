@@ -38,14 +38,31 @@ jobs:
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Static code analysis using GitHub CodeQL
-      # Static code analysis using GitHub CodeQL
+      # Initialize CodeQL
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: 'csharp'
 
-      - name: Run CodeQL Analysis
+      # Perform CodeQL Analysis
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+      # Upload SARIF report for GitHub Security Dashboard
+      - name: Upload SARIF Report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif  # Ensure this matches the generated report path
+
+      # Enforce security check - Fail pipeline if vulnerabilities are found
+      - name: Enforce Security Check
+        run: |
+          if grep -q '"ruleId"' results.sarif; then
+            echo "CodeQL detected security issues. Please fix them before merging!";
+            exit 1;
+          fi
+
+
 
 
   test:
