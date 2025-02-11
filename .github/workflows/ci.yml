@@ -1,3 +1,4 @@
+
 name: CargoHub CI Workflow
 
 on:
@@ -27,6 +28,7 @@ jobs:
       # Debug directory structure (optional)
       - name: List Files
         run: ls -R
+        working-directory: .
 
       # Set up .NET SDK for .NET 8.0
       - name: Setup .NET SDK
@@ -37,6 +39,7 @@ jobs:
       # Restore .NET dependencies
       - name: Restore dependencies
         run: dotnet restore
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Initialize CodeQL with the default setup
       - name: Initialize CodeQL
@@ -47,6 +50,6 @@ jobs:
         run: dotnet build --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # Run CodeQL Analysis (default queries, no need for advanced configuration)
+      # Run CodeQL Analysis (default queries, no SARIF handling)
       - name: Run CodeQL Analysis
         uses: github/codeql-action/analyze@v3
