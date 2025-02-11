@@ -104,28 +104,12 @@ jobs:
           fi
         working-directory: UnitTests  # Ensure this points to the correct path
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test  # Ensures this job runs only after the test job is successful
-    if: success()  # Proceed only if the previous jobs were successful
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Set up .NET SDK for deployment (if needed)
-      - name: Setup .NET SDK for deployment
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      # Deploy the app (example for production)
-      - name: Deploy to Production
-        run: ./deploy.sh  # Replace with your actual deployment script
-
   notify:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: test  # ✅ Change from deploy → test
     steps:
-      - name: Notify via Slack (or other channels)
+      - name: Notify via Slack
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Deployment completed successfully for CargoHub!"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"Tests completed successfully for CargoHub!"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
