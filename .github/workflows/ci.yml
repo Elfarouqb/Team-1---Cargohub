@@ -11,7 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -51,20 +50,20 @@ jobs:
           dotnet-version: '8.0.x'
 
       # Restore dependencies for UnitTests
-      - name: Restore dependencies (UnitTests)
+      - name: Restore dependencies
         run: dotnet restore
-        working-directory: UnitTests  # Set working directory to UnitTests
+        working-directory: UnitTests  # Use relative path
 
       # Build the UnitTests project
-      - name: Build (UnitTests)
+      - name: Build UnitTests project
         run: dotnet build --no-restore --configuration Release
-        working-directory: UnitTests  # Set working directory to UnitTests
+        working-directory: UnitTests  # Use relative path
 
       # Run unit tests for the UnitTests project
       - name: Run unit tests
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
-        working-directory: UnitTests  # Set working directory to UnitTests
+        working-directory: UnitTests  # Use relative path
 
 
 
