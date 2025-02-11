@@ -34,17 +34,19 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Restore .NET dependencies
+      # Restore .NET dependencies (specify correct working directory)
       - name: Restore dependencies
         run: dotnet restore
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Initialize CodeQL with the default setup (auto-detection of languages)
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
 
-      # Build the Solution (Required for CodeQL)
+      # Build the Solution (Required for CodeQL, specify correct working directory)
       - name: Build Solution
         run: dotnet build --configuration Release
+        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
       # Run CodeQL Analysis (default queries, no custom configuration)
       - name: Run CodeQL Analysis
