@@ -40,16 +40,16 @@ jobs:
         run: dotnet restore
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # ✅ Enable Default CodeQL Analysis (Auto-Detect Languages)
-      - name: Enable Default CodeQL
+      # Initialize CodeQL (default auto-detect)
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
 
-      # ✅ Build the Solution (Required for CodeQL)
+      # Build the Solution (Required for CodeQL)
       - name: Build Solution
         run: dotnet build --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # ✅ Run CodeQL Analysis
+      # Run CodeQL Analysis (default queries)
       - name: Run CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
