@@ -24,7 +24,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Debug directory structure
+      # Debug directory structure (optional)
       - name: List Files
         run: ls -R
         working-directory: .
@@ -43,13 +43,14 @@ jobs:
       # Initialize CodeQL (default auto-detect)
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
+        with:
+          languages: 'csharp'  # You can specify the languages explicitly, if necessary
 
       # Build the Solution (Required for CodeQL)
       - name: Build Solution
         run: dotnet build --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # Run CodeQL Analysis (default queries)
+      # Run CodeQL Analysis (default queries, no SARIF handling)
       - name: Run CodeQL Analysis
         uses: github/codeql-action/analyze@v3
-
