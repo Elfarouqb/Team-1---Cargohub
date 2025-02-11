@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read  # Allows workflow to access the repo code
+  security-events: write  
 
 jobs:
   build:
@@ -44,19 +45,15 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         working-directory: CargoHubV2/Cargohub V2/Cargohub V2
 
-      # Initialize CodeQL (v3)
+      # ✅ Initialize CodeQL (v3) with Security Permissions
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: 'csharp'
 
-      # Run CodeQL Analysis
+      # ✅ Run CodeQL Analysis and Upload Results
       - name: Run CodeQL Analysis
         uses: github/codeql-action/analyze@v3
-
-      # Print CodeQL results to logs instead of uploading
-      - name: Display CodeQL Results
-        run: cat results.sarif || echo "No CodeQL results found or analysis completed without issues."
 
   test:
     runs-on: ubuntu-latest
@@ -86,7 +83,6 @@ jobs:
       - name: Run unit tests
         run: dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
         working-directory: UnitTests
-
 
   notify:
     runs-on: ubuntu-latest
