@@ -15,13 +15,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Debug
+      # Debugging: Check folder structure
       - name: Print Working Directory
         run: pwd
 
       - name: List All Files
         run: ls -R
-
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
@@ -32,12 +31,12 @@ jobs:
       - name: Find CargohubV2.csproj
         run: find . -name "CargohubV2.csproj"
 
-      # Restore .NET dependencies for the main app
+      # Restore dependencies for the main app
       - name: Restore dependencies (Main App)
         run: dotnet restore
         working-directory: "CargoHubV2/Cargohub V2/Cargohub V2"
 
-      # Clean previous builds (to prevent cache issues)
+      # Clean previous builds
       - name: Clean Solution
         run: dotnet clean
         working-directory: "CargoHubV2/Cargohub V2/Cargohub V2"
@@ -54,7 +53,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Debug
+      # Debugging: Check folder structure
       - name: Print Working Directory
         run: pwd
 
@@ -76,12 +75,17 @@ jobs:
         run: dotnet restore
         working-directory: UnitTests
 
+      #Reference?
+      - name: Add project reference (UnitTests -> CargohubV2)
+        run: |
+          dotnet add UnitTests/UnitTests.csproj reference "CargoHubV2/Cargohub V2/Cargohub V2/CargohubV2.csproj"
 
+      # Clean UnitTests project
       - name: Clean UnitTests project
         run: dotnet clean
         working-directory: UnitTests
 
-      # Build
+      # Build UnitTests project
       - name: Build UnitTests project
         run: dotnet build --no-restore --configuration Release
         working-directory: UnitTests
@@ -91,6 +95,3 @@ jobs:
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
         working-directory: UnitTests
-
-
-
