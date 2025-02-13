@@ -46,9 +46,24 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         working-directory: "CargoHubV2/Cargohub V2/Cargohub V2"
 
+  codeql:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up CodeQL
+      - name: Set up CodeQL
+        uses: github/codeql-action/setup@v2
+
+      # Run CodeQL analysis
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+
   test:
     runs-on: ubuntu-latest
-    needs: build  
+    needs: codeql  # Run tests after CodeQL completes
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -75,7 +90,7 @@ jobs:
         run: dotnet restore
         working-directory: UnitTests
 
-      #Reference?
+      # Reference?
       - name: Add project reference (UnitTests -> CargohubV2)
         run: |
           dotnet add UnitTests/UnitTests.csproj reference "CargoHubV2/Cargohub V2/Cargohub V2/CargohubV2.csproj"
