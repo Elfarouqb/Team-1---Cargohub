@@ -15,33 +15,51 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Debug directory structure
-      - name: List Files
-        run: ls -R
-        working-directory: .
+      # Debug
+      - name: Print Working Directory
+        run: pwd
 
-      # Set up .NET SDK for .NET 8.0
+      - name: List All Files
+        run: ls -R
+
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
+      # Debug
+      - name: Find CargohubV2.csproj
+        run: find . -name "CargohubV2.csproj"
+
       # Restore .NET dependencies for the main app
       - name: Restore dependencies (Main App)
         run: dotnet restore
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+        working-directory: "CargoHubV2/Cargohub V2/Cargohub V2"
+
+      # Clean previous builds (to prevent cache issues)
+      - name: Clean Solution
+        run: dotnet clean
+        working-directory: "CargoHubV2/Cargohub V2/Cargohub V2"
 
       # Build the main application
       - name: Build (Main App)
         run: dotnet build --no-restore --configuration Release
-        working-directory: CargoHubV2/Cargohub V2/Cargohub V2
+        working-directory: "CargoHubV2/Cargohub V2/Cargohub V2"
 
   test:
     runs-on: ubuntu-latest
-    needs: build  # Ensures this job runs only after the build job is successful
+    needs: build  
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Debug
+      - name: Print Working Directory
+        run: pwd
+
+      - name: List All Files
+        run: ls -R
 
       # Set up .NET SDK for .NET 8.0
       - name: Setup .NET SDK for testing
@@ -49,21 +67,30 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      # Debug
+      - name: Find UnitTests.csproj
+        run: find . -name "UnitTests.csproj"
+
       # Restore dependencies for UnitTests
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: UnitTests  # Use relative path
+        working-directory: UnitTests
 
-      # Build the UnitTests project
+
+      - name: Clean UnitTests project
+        run: dotnet clean
+        working-directory: UnitTests
+
+      # Build
       - name: Build UnitTests project
         run: dotnet build --no-restore --configuration Release
-        working-directory: UnitTests  # Use relative path
+        working-directory: UnitTests
 
       # Run unit tests for the UnitTests project
       - name: Run unit tests
         run: |
           dotnet test UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
-        working-directory: UnitTests  # Use relative path
+        working-directory: UnitTests
 
 
 
