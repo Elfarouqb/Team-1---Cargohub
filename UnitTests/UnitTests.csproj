@@ -20,8 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Fixed the path to the CargohubV2.csproj -->
     <ProjectReference Include="..\CargohubV2\Cargohub V2\Cargohub V2\CargohubV2.csproj" />
   </ItemGroup>
 
 </Project>
+
 
